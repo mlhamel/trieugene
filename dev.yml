@@ -1,0 +1,10 @@
+name: trieugene
+up:
+  - homebrew:
+    - golangci/tap/golangci-lint
+  - go:
+      version: 1.13
+      modules: true
+  - railgun
+commands:
+  build: go build -o bin/trieugene cmd/trieugene/main.go

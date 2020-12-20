@@ -1,0 +1,4 @@
+[[constraint]]
+    name = "github.com/mlhamel/trieugene"
+    version = "0.0.1"
+    branch = "master"
