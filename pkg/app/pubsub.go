@@ -29,7 +29,7 @@ func (l *listener) Run(ctx context.Context) error {
 		return err
 	}
 
-	return pubsub.Listen(ctx, "outflow-topic", func(ctx context.Context, msg messages.Message) error {
+	err = pubsub.Listen(ctx, "rougecombien-outflow", func(ctx context.Context, msg messages.Message) error {
 		data := msg.Data()
 		outflow := store.Outflow{}
 
@@ -47,4 +47,8 @@ func (l *listener) Run(ctx context.Context) error {
 
 		return nil
 	})
+	if err != nil {
+		return err
+	}
+	return nil
 }
