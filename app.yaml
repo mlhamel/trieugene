@@ -1,0 +1,2 @@
+runtime: go113 # or go112 or go113 for the Go 1.12 or Go 1.13 runtime
+main: ./cmd/trieugene/main.go
