@@ -17,7 +17,7 @@ func main() {
 	cliApp := cli.App{
 		Name: "trieugene",
 		Action: func(*cli.Context) error {
-			run(app.NewListener(cfg))
+			run(app.NewListener(cfg), app.NewWeb(cfg))
 			return nil
 		},
 	}
