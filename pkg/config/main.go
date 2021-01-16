@@ -48,7 +48,7 @@ func (c *Config) Logger() *zerolog.Logger {
 }
 
 func (c *Config) PubSubURL() string {
-	return "trieugene.myshopify.io:8432"
+	return "trieugene.myshopify.io:8085"
 }
 
 func (c *Config) GCSURL() string {

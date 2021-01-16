@@ -26,7 +26,7 @@ func main() {
 		{
 			Name: "dev",
 			Action: func(c *cli.Context) error {
-				run(setupDevelopment(cfg), app.NewListener(cfg), app.NewWeb(cfg))
+				run(setupDevelopment(cfg), app.NewListener(cfg))
 				run(tearDownDevelopment())
 				return nil
 			},
@@ -54,6 +54,16 @@ func setupDevelopment(cfg *config.Config) runnable.Runnable {
 			return err
 		}
 
+		err = os.Setenv("PUBSUB_PROJECT_ID", cfg.ProjectID())
+		if err != nil {
+			return err
+		}
+
+		err = os.Setenv("GOOGLE_API_GO_EXPERIMENTAL_DISABLE_DEFAULT_DEADLINE", "1")
+		if err != nil {
+			return err
+		}
+
 		return nil
 	})
 }
@@ -66,6 +76,16 @@ func tearDownDevelopment() runnable.Runnable {
 		}
 
 		err = os.Unsetenv("PUBSUB_EMULATOR_HOST")
+		if err != nil {
+			return err
+		}
+
+		err = os.Unsetenv("PUBSUB_PROJECT_ID")
+		if err != nil {
+			return err
+		}
+
+		err = os.Unsetenv("GOOGLE_API_GO_EXPERIMENTAL_DISABLE_DEFAULT_DEADLINE")
 		if err != nil {
 			return err
 		}

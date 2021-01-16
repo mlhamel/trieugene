@@ -35,7 +35,7 @@ func (p *PubSubMessage) Data() []byte {
 }
 
 func NewPubSubListener(ctx context.Context, cfg *config.Config) (Listener, error) {
-	client, err := pubsub.NewClient(ctx, cfg.ProjectID())
+	client, err := pubsub.NewClient(context.Background(), cfg.ProjectID())
 
 	if err != nil {
 		return nil, err
@@ -50,19 +50,23 @@ func NewPubSubListener(ctx context.Context, cfg *config.Config) (Listener, error
 func (p *PubSubListener) Listen(ctx context.Context, topic string, callback ListenerFuncType) error {
 	var sub *pubsub.Subscription
 
-	sub, err := p.find(ctx, topic)
+	// sub, err := p.find(ctx, topic)
+
+	// if err != nil {
+	// 	return fmt.Errorf("could not search for subscription: %v", err)
+	// }
+
+	sub, err := p.create(ctx, topic)
 
 	if err != nil {
-		return fmt.Errorf("could not search for subscription: %v", err)
+		return fmt.Errorf("could not create subscription: %v", err)
 	}
 
-	if sub == nil {
-		sub, err = p.create(ctx, topic)
-
-		if err != nil {
-			return fmt.Errorf("could not create subscription: %v", err)
-		}
+	cfg, err := sub.Config(ctx)
+	if err != nil {
+		return fmt.Errorf("could configure subscription: %v", err)
 	}
+	sub.ReceiveSettings.MaxExtension = cfg.AckDeadline
 
 	cctx, cancel := context.WithCancel(ctx)
 	return sub.Receive(cctx, func(ctx context.Context, msg *pubsub.Message) {
@@ -92,7 +96,6 @@ func (p *PubSubListener) find(ctx context.Context, topic string) (*pubsub.Subscr
 func (p *PubSubListener) create(ctx context.Context, topic string) (*pubsub.Subscription, error) {
 	t := p.client.Topic(topic)
 	exists, err := t.Exists(ctx)
-
 	if err != nil {
 		return nil, err
 	}
