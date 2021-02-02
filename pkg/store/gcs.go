@@ -2,18 +2,19 @@ package store
 
 import (
 	"context"
+	"time"
 
 	"cloud.google.com/go/storage"
 	"github.com/mlhamel/trieugene/pkg/config"
 )
 
-type GoogleCloudStorageStore struct {
+type GoogleCloudStorage struct {
 	cfg    *config.Config
 	client *storage.Client
 	bucket *storage.BucketHandle
 }
 
-func NewGoogleCloudStorageStore(ctx context.Context, cfg *config.Config) (Store, error) {
+func NewGoogleCloudStorage(ctx context.Context, cfg *config.Config) (Store, error) {
 	client, err := storage.NewClient(ctx)
 	if err != nil {
 		return nil, err
@@ -21,7 +22,7 @@ func NewGoogleCloudStorageStore(ctx context.Context, cfg *config.Config) (Store,
 
 	bucket := client.Bucket(cfg.BucketName())
 
-	instance := GoogleCloudStorageStore{
+	instance := GoogleCloudStorage{
 		cfg:    cfg,
 		client: client,
 		bucket: bucket,
@@ -30,10 +31,10 @@ func NewGoogleCloudStorageStore(ctx context.Context, cfg *config.Config) (Store,
 	return &instance, nil
 }
 
-func (g *GoogleCloudStorageStore) Setup(ctx context.Context) error {
+func (g *GoogleCloudStorage) Setup(ctx context.Context) error {
 	return g.bucket.Create(ctx, g.cfg.ProjectID(), nil)
 }
 
-func (g *GoogleCloudStorageStore) PersistOutflow(ctx context.Context, outflow *Outflow) error {
+func (g *GoogleCloudStorage) Persist(ctx context.Context, timestamp time.Time, key string, data interface{}) error {
 	return nil
 }

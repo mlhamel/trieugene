@@ -13,15 +13,12 @@ services:
   - nginx
 
 custom_services:
-    - pubsub:
-        healthcheck_port: 8432
-        image: 'singularities/pubsub-emulator'
-        env:
-          PUBSUB_LISTEN_ADDRESS: 0.0.0.0:8432
-          PUBSUB_PROJECT_ID: trieugene1
-    - gcs:
-        healthcheck_port: 4443
-        image: fsouza/fake-gcs-server
+    - faktory:
+        healthcheck_port: 7419
+        image: 'contribsys/faktory'
+    - fakes3:
+        healthcheck_port: 8000
+        image: fingershock/fakes3
 
 hostnames:
   - trieugene.myshopify.io: { proxy_to_host_port: 9602 }

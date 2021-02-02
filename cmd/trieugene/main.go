@@ -17,7 +17,7 @@ func main() {
 	cliApp := cli.App{
 		Name: "trieugene",
 		Action: func(*cli.Context) error {
-			run(app.NewListener(cfg), app.NewWeb(cfg))
+			run(app.NewFaktory(cfg))
 			return nil
 		},
 	}
@@ -26,9 +26,30 @@ func main() {
 		{
 			Name: "dev",
 			Action: func(c *cli.Context) error {
-				run(setupDevelopment(cfg), app.NewListener(cfg))
+				run(setupDevelopment(cfg), app.NewFaktory(cfg))
 				run(tearDownDevelopment())
 				return nil
+			},
+		},
+		{
+			Name: "store",
+			Action: func(c *cli.Context) error {
+				c.Args().Get(0)
+				run(setupDevelopment(cfg), app.NewStore(cfg, c.String("key"), c.String("value")))
+				run(tearDownDevelopment())
+				return nil
+			},
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "key",
+					Usage:    "Key of the stored object",
+					Required: true,
+				},
+				&cli.StringFlag{
+					Name:     "value",
+					Usage:    "value of the stored object",
+					Required: true,
+				},
 			},
 		},
 	}

@@ -1,8 +1,10 @@
 package store
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 type Store interface {
-	Setup(context.Context) error
-	PersistOutflow(context.Context, *Outflow) error
+	Persist(context.Context, time.Time, string, interface{}) error
 }

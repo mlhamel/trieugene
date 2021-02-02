@@ -55,6 +55,22 @@ func (c *Config) GCSURL() string {
 	return "trieugene.myshopify.io:4443"
 }
 
+func (c *Config) S3Bucket() string {
+	return GetEnv("TRIEUGENE_S3_BUCKET", "trieugene")
+}
+
+func (c *Config) S3Key() string {
+	return GetEnv("TRIEUGENE_S3_KEY", "trieugene_key")
+}
+
+func (c *Config) S3URL() string {
+	return GetEnv("TRIEUGENE_S3_URL", "trieugene.myshopify.io:8000")
+}
+
+func (c *Config) S3Region() string {
+	return GetEnv("TRIEUGENE_S3_REGION", "us-west-2")
+}
+
 func (c *Config) HTTPPort() int {
 	return c.httpPort
 }

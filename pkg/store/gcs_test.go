@@ -8,16 +8,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewGoogleCloudStorageStore(t *testing.T) {
-	store, err := NewGoogleCloudStorageStore(context.Background(), config.NewConfig())
+func TestNewGoogleCloudStorage(t *testing.T) {
+	store, err := NewGoogleCloudStorage(context.Background(), config.NewConfig())
 
 	require.NoError(t, err)
 	require.NotNil(t, store)
 }
 
-func TestGoogleCloudStorageStoreSetup(t *testing.T) {
+func TestGoogleCloudStorageSetup(t *testing.T) {
 	ctx := context.Background()
-	store, _ := NewGoogleCloudStorageStore(ctx, config.NewConfig())
+	store, _ := NewGoogleCloudStorage(ctx, config.NewConfig())
 
 	err := store.Setup(ctx)
 
