@@ -6,6 +6,7 @@ import (
 
 	"github.com/mlhamel/trieugene/pkg/app"
 	"github.com/mlhamel/trieugene/pkg/config"
+	"github.com/mlhamel/trieugene/pkg/store"
 	"github.com/pior/runnable"
 
 	"github.com/urfave/cli"
@@ -17,7 +18,13 @@ func main() {
 	cliApp := cli.App{
 		Name: "trieugene",
 		Action: func(*cli.Context) error {
-			run(app.NewFaktory(cfg))
+			ctx := context.Background()
+			store, err := store.NewGoogleCloudStorage(ctx, cfg)
+			if err != nil {
+				return err
+			}
+
+			run(app.NewFaktory(cfg, store))
 			return nil
 		},
 	}
@@ -26,7 +33,9 @@ func main() {
 		{
 			Name: "dev",
 			Action: func(c *cli.Context) error {
-				run(setupDevelopment(cfg), app.NewFaktory(cfg))
+				store := store.NewS3(cfg)
+
+				run(setupDevelopment(cfg), app.NewFaktory(cfg, store))
 				run(tearDownDevelopment())
 				return nil
 			},
@@ -34,8 +43,9 @@ func main() {
 		{
 			Name: "store",
 			Action: func(c *cli.Context) error {
-				c.Args().Get(0)
-				run(setupDevelopment(cfg), app.NewStore(cfg, c.String("key"), c.String("value")))
+				store := store.NewS3(cfg)
+
+				run(setupDevelopment(cfg), app.NewStore(cfg, store, c.String("key"), c.String("value")))
 				run(tearDownDevelopment())
 				return nil
 			},

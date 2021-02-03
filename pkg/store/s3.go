@@ -36,7 +36,6 @@ func NewS3(cfg *config.Config) Store {
 
 func (s *S3) Persist(ctx context.Context, timestamp time.Time, key string, data interface{}) error {
 	ctx = context.Background()
-
 	s.cfg.Logger().Debug().Msgf("Persisting %s: %s", key, data)
 	_, err := s.client.PutObjectWithContext(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(s.cfg.S3Bucket()),
@@ -46,8 +45,4 @@ func (s *S3) Persist(ctx context.Context, timestamp time.Time, key string, data 
 	s.cfg.Logger().Debug().Msgf("Persisting %s: Succeed", key)
 
 	return err
-}
-
-func buildKey(timestamp time.Time, key string) string {
-	return fmt.Sprintf("%s/%d", key, timestamp.Unix())
 }

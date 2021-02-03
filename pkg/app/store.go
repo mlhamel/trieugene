@@ -18,13 +18,13 @@ type Store struct {
 	value string
 }
 
-func NewStore(cfg *config.Config, key string, value string) runnable.Runnable {
-	store := store.NewS3(cfg)
-
+func NewStore(cfg *config.Config, store store.Store, key string, value string) runnable.Runnable {
 	return &Store{cfg: cfg, store: store, key: key, value: value}
 }
 
 func (s *Store) Run(ctx context.Context) error {
+	s.cfg.Logger().Debug().Msgf("Apps/Store/Run: Start")
+
 	var result interface{}
 
 	err := json.Unmarshal([]byte(s.value), &result)
@@ -32,5 +32,12 @@ func (s *Store) Run(ctx context.Context) error {
 		return fmt.Errorf("Error while unmarshaling value (%s): %w", s.value, err)
 	}
 
-	return s.store.Persist(ctx, time.Now(), s.key, result)
+	err = s.store.Persist(context.Background(), time.Now(), s.key, result)
+	if err != nil {
+		return err
+	}
+
+	s.cfg.Logger().Debug().Msgf("Apps/Store/Run: Success")
+
+	return nil
 }

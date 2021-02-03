@@ -17,9 +17,7 @@ type Faktory struct {
 	store   store.Store
 }
 
-func NewFaktory(cfg *config.Config) runnable.Runnable {
-	store := store.NewS3(cfg)
-
+func NewFaktory(cfg *config.Config, store store.Store) runnable.Runnable {
 	outflowJob := jobs.NewOutflowJob(cfg, store)
 
 	manager := worker.NewManager()

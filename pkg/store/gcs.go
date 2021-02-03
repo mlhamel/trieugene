@@ -1,7 +1,10 @@
 package store
 
 import (
+	"bytes"
 	"context"
+	"fmt"
+	"io"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -15,6 +18,7 @@ type GoogleCloudStorage struct {
 }
 
 func NewGoogleCloudStorage(ctx context.Context, cfg *config.Config) (Store, error) {
+	cfg.Logger().Debug().Msgf("NewGoogleCloudStorage: Initiating")
 	client, err := storage.NewClient(ctx)
 	if err != nil {
 		return nil, err
@@ -28,6 +32,8 @@ func NewGoogleCloudStorage(ctx context.Context, cfg *config.Config) (Store, erro
 		bucket: bucket,
 	}
 
+	cfg.Logger().Debug().Msgf("NewGoogleCloudStorage: Succeed")
+
 	return &instance, nil
 }
 
@@ -36,5 +42,21 @@ func (g *GoogleCloudStorage) Setup(ctx context.Context) error {
 }
 
 func (g *GoogleCloudStorage) Persist(ctx context.Context, timestamp time.Time, key string, data interface{}) error {
+	g.cfg.Logger().Debug().Msgf("Store/GoogleCloudStorage/Persist: Start")
+	fileName := buildKey(timestamp, key)
+	object := g.bucket.Object(fileName)
+	w := object.NewWriter(ctx)
+	reader := bytes.NewReader([]byte(fmt.Sprintf("%v", data)))
+
+	if _, err := io.Copy(w, reader); err != nil {
+		return err
+	}
+
+	if err := w.Close(); err != nil {
+		return err
+	}
+
+	g.cfg.Logger().Debug().Msgf("GoogleCloudStorage/Persist: Success")
+
 	return nil
 }
