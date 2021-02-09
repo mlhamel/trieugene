@@ -3,35 +3,31 @@ package app
 import (
 	"context"
 
-	"github.com/mlhamel/trieugene/pkg/store"
-
-	worker "github.com/contribsys/faktory_worker_go"
 	"github.com/mlhamel/trieugene/pkg/config"
 	"github.com/mlhamel/trieugene/pkg/jobs"
+	"github.com/mlhamel/trieugene/pkg/store"
 	"github.com/pior/runnable"
 )
 
 type Faktory struct {
 	cfg     *config.Config
-	manager *worker.Manager
 	store   store.Store
+	manager jobs.Manager
 }
 
 func NewFaktory(cfg *config.Config, store store.Store) runnable.Runnable {
 	outflowJob := jobs.NewOutflowJob(cfg, store)
 
-	manager := worker.NewManager()
-	manager.ProcessStrictPriorityQueues("high", "medium", "low")
-	manager.Register(outflowJob.Name(), outflowJob.Run)
+	manager := jobs.NewFaktoryManager(cfg)
+	manager.Register(outflowJob)
 
 	return &Faktory{
 		cfg:     cfg,
-		manager: manager,
 		store:   store,
+		manager: manager,
 	}
 }
 
 func (f *Faktory) Run(ctx context.Context) error {
-	f.manager.Run()
-	return nil
+	return f.manager.Run(ctx)
 }
