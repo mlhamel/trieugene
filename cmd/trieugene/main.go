@@ -35,7 +35,8 @@ func main() {
 			Action: func(c *cli.Context) error {
 				store := store.NewS3(cfg)
 
-				run(setupDevelopment(cfg), app.NewFaktory(cfg, store))
+				run(setupDevelopment(cfg))
+				app.NewFaktory(cfg, store).Run(context.Background())
 				run(tearDownDevelopment())
 				return nil
 			},
@@ -95,6 +96,15 @@ func setupDevelopment(cfg *config.Config) runnable.Runnable {
 			return err
 		}
 
+		err = os.Setenv("FAKTORY_URL", cfg.FaktoryURL())
+		if err != nil {
+			return err
+		}
+
+		err = os.Setenv("FAKTORY_PROVIDER", "FAKTORY_URL")
+		if err != nil {
+			return err
+		}
 		return nil
 	})
 }
@@ -102,6 +112,11 @@ func setupDevelopment(cfg *config.Config) runnable.Runnable {
 func tearDownDevelopment() runnable.Runnable {
 	return runnable.Func(func(ctx context.Context) error {
 		err := os.Unsetenv("STORAGE_EMULATOR_HOST")
+		if err != nil {
+			return err
+		}
+
+		err = os.Unsetenv("FAKTORY_PROVIDER")
 		if err != nil {
 			return err
 		}

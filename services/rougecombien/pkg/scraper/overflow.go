@@ -2,6 +2,8 @@ package scraper
 
 import (
 	"context"
+	"crypto/sha1"
+	"encoding/base64"
 	"encoding/csv"
 	"fmt"
 	"net/http"
@@ -17,7 +19,7 @@ const url = "https://www.cehq.gouv.qc.ca/suivihydro/fichier_donnees.asp?NoStatio
 type Scraper struct {
 	cfg      *config.Config
 	client   *http.Client
-	consumer func(context.Context, *Result) error
+	consumer func(context.Context, Result) error
 }
 
 type Result struct {
@@ -26,8 +28,18 @@ type Result struct {
 	Outflow   float64
 }
 
-func NewScraper(cfg *config.Config, consumer func(context.Context, *Result) error) *Scraper {
-	return &Scraper{cfg: cfg, client: &http.Client{}}
+func (r *Result) Sha1() string {
+	hasher := sha1.New()
+	_, err := hasher.Write([]byte(fmt.Sprintf("%f", r.Outflow)))
+	if err != nil {
+		return ""
+	}
+
+	return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+}
+
+func NewScraper(cfg *config.Config, consumer func(context.Context, Result) error) *Scraper {
+	return &Scraper{cfg: cfg, client: &http.Client{}, consumer: consumer}
 }
 
 func (s *Scraper) Run(ctx context.Context) error {
@@ -74,6 +86,7 @@ func (s *Scraper) Run(ctx context.Context) error {
 		}
 
 		rawFlow := strings.Replace(each[2], ",", ".", 1)
+		rawFlow = strings.Replace(rawFlow, "*", "", 1)
 
 		outflow, err := strconv.ParseFloat(rawFlow, 64)
 
@@ -93,7 +106,7 @@ func (s *Scraper) Run(ctx context.Context) error {
 			Float64("Outflow", record.Outflow).
 			Msg("Record parsed")
 
-		if err = s.consumer(ctx, &record); err != nil {
+		if err = s.consumer(ctx, record); err != nil {
 			return err
 		}
 	}

@@ -51,6 +51,10 @@ func (c *Config) PubSubURL() string {
 	return "trieugene.myshopify.io:8085"
 }
 
+func (c *Config) FaktoryURL() string {
+	return "tcp://trieugene.myshopify.io:7419"
+}
+
 func (c *Config) GCSURL() string {
 	return "trieugene.myshopify.io:4443"
 }

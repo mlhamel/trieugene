@@ -17,7 +17,7 @@ type Manager interface {
 }
 
 type Message struct {
-	processedAt time.Time `json:"processed_at"`
-	id          string    `json:"id"`
-	data        string    `json:"data"`
+	ProcessedAt time.Time `json:"processed_at"`
+	ID          string    `json:"id"`
+	Data        string    `json:"data"`
 }
