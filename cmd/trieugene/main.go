@@ -5,14 +5,16 @@ import (
 	"os"
 
 	"github.com/mlhamel/trieugene/pkg/app"
+	"github.com/mlhamel/trieugene/pkg/config"
 	"github.com/urfave/cli"
 )
 
 func main() {
-	trieugene := app.NewTrieugene()
+	cfg := config.NewConfig()
 	cliApp := cli.App{
 		Name: "trieugene",
 		Action: func(*cli.Context) error {
+			trieugene := app.NewTrieugene(cfg)
 			return trieugene.Run(context.Background())
 		},
 	}
@@ -21,13 +23,15 @@ func main() {
 		{
 			Name: "dev",
 			Action: func(c *cli.Context) error {
-				return trieugene.RunDevelopment(context.Background())
+				trieugene := app.NewTrieugeneDev(cfg)
+				return trieugene.Run(context.Background())
 			},
 		},
 		{
 			Name: "store",
 			Action: func(c *cli.Context) error {
-				return trieugene.RunStore(context.Background(), c.String("key"), c.String("value"))
+				trieugene := app.NewTrieugeneStore(cfg, c.String("key"), c.String("value"))
+				return trieugene.Run(context.Background())
 			},
 			Flags: []cli.Flag{
 				&cli.StringFlag{

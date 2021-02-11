@@ -9,16 +9,33 @@ import (
 	"github.com/pior/runnable"
 )
 
-type Trieugene struct {
+type trieugene struct {
 	cfg *config.Config
 }
 
-func NewTrieugene() *Trieugene {
-	cfg := config.NewConfig()
-	return &Trieugene{cfg: cfg}
+type trieugeneDev struct {
+	cfg *config.Config
 }
 
-func (t *Trieugene) Run(ctx context.Context) error {
+type trieugeneStore struct {
+	cfg   *config.Config
+	key   string
+	value string
+}
+
+func NewTrieugene(cfg *config.Config) runnable.Runnable {
+	return &trieugene{cfg: cfg}
+}
+
+func NewTrieugeneDev(cfg *config.Config) runnable.Runnable {
+	return &trieugeneDev{cfg: cfg}
+}
+
+func NewTrieugeneStore(cfg *config.Config, key string, value string) runnable.Runnable {
+	return &trieugeneStore{cfg: cfg}
+}
+
+func (t *trieugene) Run(ctx context.Context) error {
 	store, err := store.NewGoogleCloudStorage(ctx, t.cfg)
 	if err != nil {
 		return err
@@ -26,7 +43,7 @@ func (t *Trieugene) Run(ctx context.Context) error {
 	return NewFaktory(t.cfg, store).Run(ctx)
 }
 
-func (t *Trieugene) RunDevelopment(ctx context.Context) error {
+func (t *trieugeneDev) Run(ctx context.Context) error {
 	store := store.NewS3(t.cfg)
 
 	run(setupDevelopment(t.cfg))
@@ -38,12 +55,12 @@ func (t *Trieugene) RunDevelopment(ctx context.Context) error {
 	return err
 }
 
-func (t *Trieugene) RunStore(ctx context.Context, key string, value string) error {
+func (t *trieugeneStore) Run(ctx context.Context) error {
 	store := store.NewS3(t.cfg)
 
 	run(setupDevelopment(t.cfg))
 
-	err := NewStore(t.cfg, store, key, value).Run(ctx)
+	err := NewStore(t.cfg, store, t.key, t.value).Run(ctx)
 
 	run(tearDownDevelopment())
 
