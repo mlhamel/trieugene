@@ -5,27 +5,15 @@ import (
 	"os"
 
 	"github.com/mlhamel/trieugene/pkg/app"
-	"github.com/mlhamel/trieugene/pkg/config"
-	"github.com/mlhamel/trieugene/pkg/store"
-	"github.com/pior/runnable"
-
 	"github.com/urfave/cli"
 )
 
 func main() {
-	cfg := config.NewConfig()
-
+	trieugene := app.NewTrieugene()
 	cliApp := cli.App{
 		Name: "trieugene",
 		Action: func(*cli.Context) error {
-			ctx := context.Background()
-			store, err := store.NewGoogleCloudStorage(ctx, cfg)
-			if err != nil {
-				return err
-			}
-
-			run(app.NewFaktory(cfg, store))
-			return nil
+			return trieugene.Run(context.Background())
 		},
 	}
 
@@ -33,22 +21,13 @@ func main() {
 		{
 			Name: "dev",
 			Action: func(c *cli.Context) error {
-				store := store.NewS3(cfg)
-
-				run(setupDevelopment(cfg))
-				app.NewFaktory(cfg, store).Run(context.Background())
-				run(tearDownDevelopment())
-				return nil
+				return trieugene.RunDevelopment(context.Background())
 			},
 		},
 		{
 			Name: "store",
 			Action: func(c *cli.Context) error {
-				store := store.NewS3(cfg)
-
-				run(setupDevelopment(cfg), app.NewStore(cfg, store, c.String("key"), c.String("value")))
-				run(tearDownDevelopment())
-				return nil
+				return trieugene.RunStore(context.Background(), c.String("key"), c.String("value"))
 			},
 			Flags: []cli.Flag{
 				&cli.StringFlag{
@@ -68,74 +47,4 @@ func main() {
 	if err := cliApp.Run(os.Args); err != nil {
 		panic(err)
 	}
-}
-
-func run(runnables ...runnable.Runnable) {
-	runnable.RunGroup(runnables...)
-}
-
-func setupDevelopment(cfg *config.Config) runnable.Runnable {
-	return runnable.Func(func(ctx context.Context) error {
-		err := os.Setenv("STORAGE_EMULATOR_HOST", cfg.GCSURL())
-		if err != nil {
-			return err
-		}
-
-		err = os.Setenv("PUBSUB_EMULATOR_HOST", cfg.PubSubURL())
-		if err != nil {
-			return err
-		}
-
-		err = os.Setenv("PUBSUB_PROJECT_ID", cfg.ProjectID())
-		if err != nil {
-			return err
-		}
-
-		err = os.Setenv("GOOGLE_API_GO_EXPERIMENTAL_DISABLE_DEFAULT_DEADLINE", "1")
-		if err != nil {
-			return err
-		}
-
-		err = os.Setenv("FAKTORY_URL", cfg.FaktoryURL())
-		if err != nil {
-			return err
-		}
-
-		err = os.Setenv("FAKTORY_PROVIDER", "FAKTORY_URL")
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-}
-
-func tearDownDevelopment() runnable.Runnable {
-	return runnable.Func(func(ctx context.Context) error {
-		err := os.Unsetenv("STORAGE_EMULATOR_HOST")
-		if err != nil {
-			return err
-		}
-
-		err = os.Unsetenv("FAKTORY_PROVIDER")
-		if err != nil {
-			return err
-		}
-
-		err = os.Unsetenv("PUBSUB_EMULATOR_HOST")
-		if err != nil {
-			return err
-		}
-
-		err = os.Unsetenv("PUBSUB_PROJECT_ID")
-		if err != nil {
-			return err
-		}
-
-		err = os.Unsetenv("GOOGLE_API_GO_EXPERIMENTAL_DISABLE_DEFAULT_DEADLINE")
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
 }
