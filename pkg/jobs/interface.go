@@ -6,13 +6,12 @@ import (
 )
 
 type Job interface {
-	Name() string
 	Run(ctx context.Context, args ...interface{}) error
 }
 
 type Manager interface {
-	Register(Job) error
-	Perform(Job, ...interface{}) error
+	Register(string, Job) error
+	Perform(string, Job, ...interface{}) error
 	Run(context.Context) error
 }
 

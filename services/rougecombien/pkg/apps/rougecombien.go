@@ -36,9 +36,9 @@ func (r *Rougecombien) runOutflowJobUsingGCS(ctx context.Context, result scraper
 	if err != nil {
 		return err
 	}
-	job := jobs.NewOutflowJob(r.cfg, store)
+	job := jobs.NewStoreJob(r.cfg, store)
 
-	return manager.Perform(job, jobs.Message{
+	return manager.Perform("outflow-rouge", job, jobs.Message{
 		ID:          result.Sha1(),
 		ProcessedAt: result.ScrapedAt,
 		Data:        fmt.Sprintf("%f", result.Outflow),
@@ -50,9 +50,9 @@ func (r *Rougecombien) runOutflowJobUsingS3(ctx context.Context, result scraper.
 
 	store := store.NewS3(r.cfg)
 	manager := jobs.NewFaktoryManager(r.cfg)
-	job := jobs.NewOutflowJob(r.cfg, store)
+	job := jobs.NewStoreJob(r.cfg, store)
 
-	return manager.Perform(job, jobs.Message{
+	return manager.Perform("outflow-rouge", job, jobs.Message{
 		ID:          result.Sha1(),
 		ProcessedAt: result.ScrapedAt,
 		Data:        fmt.Sprintf("%f", result.Outflow),

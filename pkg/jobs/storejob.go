@@ -8,24 +8,20 @@ import (
 	"github.com/mlhamel/trieugene/pkg/store"
 )
 
-type OutflowJob struct {
+type StoreJob struct {
 	cfg   *config.Config
 	store store.Store
 }
 
-func NewOutflowJob(cfg *config.Config, store store.Store) Job {
-	return &OutflowJob{
+func NewStoreJob(cfg *config.Config, store store.Store) Job {
+	return &StoreJob{
 		cfg:   cfg,
 		store: store,
 	}
 }
 
-func (r *OutflowJob) Name() string {
-	return "outflow-rouge"
-}
-
-func (r *OutflowJob) Run(ctx context.Context, args ...interface{}) error {
-	r.cfg.Logger().Debug().Msgf("Running %s with args %v", r.Name(), args)
+func (r *StoreJob) Run(ctx context.Context, args ...interface{}) error {
+	r.cfg.Logger().Debug().Msgf("Running StoreJob with args %v", args)
 
 	for a := range args {
 		var msg = Message{}
@@ -50,6 +46,6 @@ func (r *OutflowJob) Run(ctx context.Context, args ...interface{}) error {
 		}
 	}
 
-	r.cfg.Logger().Debug().Msgf("Done processing %s with args %v", r.Name(), args)
+	r.cfg.Logger().Debug().Msgf("Done processing StoreJob with args %v", args)
 	return nil
 }
