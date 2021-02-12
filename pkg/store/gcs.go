@@ -41,9 +41,9 @@ func (g *GoogleCloudStorage) Setup(ctx context.Context) error {
 	return g.bucket.Create(ctx, g.cfg.ProjectID(), nil)
 }
 
-func (g *GoogleCloudStorage) Persist(ctx context.Context, timestamp time.Time, key string, data interface{}) error {
+func (g *GoogleCloudStorage) Persist(ctx context.Context, timestamp time.Time, name string, id string, data interface{}) error {
 	g.cfg.Logger().Debug().Msgf("Store/GoogleCloudStorage/Persist: Start")
-	fileName := buildKey(timestamp, key)
+	fileName := buildKey(name, timestamp.Unix(), id)
 	object := g.bucket.Object(fileName)
 	w := object.NewWriter(ctx)
 	reader := bytes.NewReader([]byte(fmt.Sprintf("%v", data)))

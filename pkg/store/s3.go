@@ -34,15 +34,15 @@ func NewS3(cfg *config.Config) Store {
 	return &S3{cfg: cfg, client: client}
 }
 
-func (s *S3) Persist(ctx context.Context, timestamp time.Time, key string, data interface{}) error {
+func (s *S3) Persist(ctx context.Context, timestamp time.Time, name string, id string, data interface{}) error {
 	ctx = context.Background()
-	s.cfg.Logger().Debug().Msgf("Persisting %s: %s", key, data)
+	s.cfg.Logger().Debug().Msgf("Persisting %s/%s: %s", name, id, data)
 	_, err := s.client.PutObjectWithContext(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(s.cfg.S3Bucket()),
-		Key:    aws.String(buildKey(timestamp, key)),
+		Key:    aws.String(buildKey(name, timestamp.Unix(), id)),
 		Body:   strings.NewReader(fmt.Sprintf("%v", data)),
 	})
-	s.cfg.Logger().Debug().Msgf("Persisting %s: Succeed", key)
+	s.cfg.Logger().Debug().Msgf("Persisting %s/%s: Succeed", name, id)
 
 	return err
 }

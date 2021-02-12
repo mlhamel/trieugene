@@ -30,10 +30,15 @@ func main() {
 		{
 			Name: "store",
 			Action: func(c *cli.Context) error {
-				trieugene := app.NewTrieugeneStore(cfg, c.String("key"), c.String("value"))
+				trieugene := app.NewTrieugeneStore(cfg, c.String("kind"), c.String("key"), c.String("value"))
 				return trieugene.Run(context.Background())
 			},
 			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "kind",
+					Usage:    "Kind of the stored object",
+					Required: true,
+				},
 				&cli.StringFlag{
 					Name:     "key",
 					Usage:    "Key of the stored object",

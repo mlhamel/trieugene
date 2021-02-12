@@ -2,9 +2,16 @@ package store
 
 import (
 	"fmt"
-	"time"
 )
 
-func buildKey(timestamp time.Time, key string) string {
-	return fmt.Sprintf("%s/%d", key, timestamp.Unix())
+func buildKey(args ...interface{}) string {
+	var key string
+	for a := range args {
+		if key != "" {
+			key = fmt.Sprintf("%s/%v", key, args[a])
+		} else {
+			key = fmt.Sprintf("%v", args[a])
+		}
+	}
+	return key
 }

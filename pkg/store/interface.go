@@ -6,5 +6,5 @@ import (
 )
 
 type Store interface {
-	Persist(context.Context, time.Time, string, interface{}) error
+	Persist(ctx context.Context, timestamp time.Time, name string, id string, data interface{}) error
 }

@@ -14,12 +14,19 @@ import (
 type Store struct {
 	cfg   *config.Config
 	store store.Store
+	kind  string
 	key   string
 	value string
 }
 
-func NewStore(cfg *config.Config, store store.Store, key string, value string) runnable.Runnable {
-	return &Store{cfg: cfg, store: store, key: key, value: value}
+func NewStore(cfg *config.Config, store store.Store, kind string, key string, value string) runnable.Runnable {
+	return &Store{
+		cfg:   cfg,
+		store: store,
+		kind:  kind,
+		key:   key,
+		value: value,
+	}
 }
 
 func (s *Store) Run(ctx context.Context) error {
@@ -32,7 +39,7 @@ func (s *Store) Run(ctx context.Context) error {
 		return fmt.Errorf("Error while unmarshaling value (%s): %w", s.value, err)
 	}
 
-	err = s.store.Persist(context.Background(), time.Now(), s.key, result)
+	err = s.store.Persist(context.Background(), time.Now(), s.kind, s.key, result)
 	if err != nil {
 		return err
 	}

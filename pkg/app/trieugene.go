@@ -19,6 +19,7 @@ type trieugeneDev struct {
 
 type trieugeneStore struct {
 	cfg   *config.Config
+	kind  string
 	key   string
 	value string
 }
@@ -31,8 +32,13 @@ func NewTrieugeneDev(cfg *config.Config) runnable.Runnable {
 	return &trieugeneDev{cfg: cfg}
 }
 
-func NewTrieugeneStore(cfg *config.Config, key string, value string) runnable.Runnable {
-	return &trieugeneStore{cfg: cfg}
+func NewTrieugeneStore(cfg *config.Config, kind string, key string, value string) runnable.Runnable {
+	return &trieugeneStore{
+		cfg:   cfg,
+		kind:  kind,
+		key:   key,
+		value: value,
+	}
 }
 
 func (t *trieugene) Run(ctx context.Context) error {
@@ -60,7 +66,7 @@ func (t *trieugeneStore) Run(ctx context.Context) error {
 
 	run(setupDevelopment(t.cfg))
 
-	err := NewStore(t.cfg, store, t.key, t.value).Run(ctx)
+	err := NewStore(t.cfg, store, t.kind, t.key, t.value).Run(ctx)
 
 	run(tearDownDevelopment())
 
