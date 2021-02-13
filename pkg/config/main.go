@@ -40,7 +40,7 @@ func (c *Config) ProjectID() string {
 }
 
 func (c *Config) BucketName() string {
-	return "trieugene-storage"
+	return GetEnv("TRIEUGENE_BUCKET_NAME", "trieugene-storage")
 }
 
 func (c *Config) Logger() *zerolog.Logger {
@@ -52,7 +52,7 @@ func (c *Config) PubSubURL() string {
 }
 
 func (c *Config) FaktoryURL() string {
-	return "tcp://trieugene.myshopify.io:7419"
+	return GetEnv("TRIEUGENE_FAKTORY_URL", "tcp://trieugene.myshopify.io:7419")
 }
 
 func (c *Config) GCSURL() string {
