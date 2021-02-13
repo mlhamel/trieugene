@@ -11,15 +11,16 @@ import (
 
 func main() {
 	cfg := config.NewConfig()
-	cliApp := cli.App{
-		Name: "trieugene",
-		Action: func(*cli.Context) error {
-			trieugene := app.NewTrieugene(cfg)
-			return trieugene.Run(context.Background())
-		},
-	}
+	cliApp := cli.App{}
 
 	cliApp.Commands = []cli.Command{
+		{
+			Name: "consumer",
+			Action: func(c *cli.Context) error {
+				trieugene := app.NewTrieugene(cfg)
+				return trieugene.Run(context.Background())
+			},
+		},
 		{
 			Name: "dev",
 			Action: func(c *cli.Context) error {
