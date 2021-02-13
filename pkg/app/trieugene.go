@@ -42,10 +42,7 @@ func NewTrieugeneStore(cfg *config.Config, kind string, key string, value string
 }
 
 func (t *trieugene) Run(ctx context.Context) error {
-	store, err := store.NewGoogleCloudStorage(ctx, t.cfg)
-	if err != nil {
-		return err
-	}
+	store := store.NewS3(t.cfg)
 	return NewFaktory(t.cfg, store).Run(ctx)
 }
 
