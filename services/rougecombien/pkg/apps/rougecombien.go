@@ -22,7 +22,7 @@ func NewRougecombien() *Rougecombien {
 }
 
 func (r *Rougecombien) Run(ctx context.Context) error {
-	return scraper.NewScraper(r.cfg, r.runOutflowJobUsingGCS).Run(ctx)
+	return scraper.NewScraper(r.cfg, r.runOutflowJobUsingS3).Run(ctx)
 }
 
 func (r *Rougecombien) RunDevelopment(ctx context.Context) error {
