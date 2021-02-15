@@ -42,8 +42,14 @@ func NewTrieugeneStore(cfg *config.Config, kind string, key string, value string
 }
 
 func (t *trieugene) Run(ctx context.Context) error {
+	run(setupProduction(t.cfg))
+
 	store := store.NewS3(t.cfg)
-	return NewFaktory(t.cfg, store).Run(ctx)
+	err := NewFaktory(t.cfg, store).Run(ctx)
+
+	run(tearDownProduction())
+
+	return err
 }
 
 func (t *trieugeneDev) Run(ctx context.Context) error {
@@ -72,6 +78,38 @@ func (t *trieugeneStore) Run(ctx context.Context) error {
 
 func run(runnables ...runnable.Runnable) {
 	runnable.RunGroup(runnables...)
+}
+
+func setupProduction(cfg *config.Config) runnable.Runnable {
+	return runnable.Func(func(ctx context.Context) error {
+		err := os.Setenv("FAKTORY_URL", cfg.FaktoryURL())
+		if err != nil {
+			return err
+		}
+
+		err = os.Setenv("FAKTORY_PROVIDER", "FAKTORY_URL")
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+func tearDownProduction() runnable.Runnable {
+	return runnable.Func(func(ctx context.Context) error {
+		err := os.Unsetenv("FAKTORY_URL")
+		if err != nil {
+			return err
+		}
+
+		err = os.Unsetenv("FAKTORY_PROVIDER")
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func setupDevelopment(cfg *config.Config) runnable.Runnable {
