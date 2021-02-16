@@ -20,7 +20,7 @@ func NewStoreJob(cfg *config.Config, store store.Store) Job {
 	}
 }
 
-func (r *StoreJob) Run(ctx context.Context, args ...interface{}) error {
+func (r *StoreJob) Perform(ctx context.Context, args ...interface{}) error {
 	r.cfg.Logger().Debug().Msgf("Running StoreJob with args %v", args)
 
 	for a := range args {
@@ -47,5 +47,13 @@ func (r *StoreJob) Run(ctx context.Context, args ...interface{}) error {
 	}
 
 	r.cfg.Logger().Debug().Msgf("Done processing StoreJob with args %v", args)
+	return nil
+}
+
+func (r *StoreJob) Run(ctx context.Context, args ...interface{}) error {
+	if err := r.Perform(ctx, args); err != nil {
+		r.cfg.Logger().Error().Err(err).Msg("An occured while running StoreJob")
+		return err
+	}
 	return nil
 }
