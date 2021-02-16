@@ -1,0 +1,36 @@
+name: trieugene
+region: nyc
+services:
+- envs:
+  http_port: 7420
+  image:
+    registry_type: DOCR
+    repository: faktory
+    tag: latest
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  internal_ports:
+  - 7419
+  name: faktory
+  routes:
+  - path: /
+workers:
+- environment_slug: go
+  envs:
+  - key: TRIEUGENE_FAKTORY_URL
+    scope: RUN_AND_BUILD_TIME
+    value: tcp://faktory:7419
+  - key: FAKTORY_URL
+    scope: RUN_AND_BUILD_TIME
+    value: tcp://faktory:7419
+  - key: FAKTORY_PROVIDER
+    scope: RUN_AND_BUILD_TIME
+    value: FAKTORY_URL
+  github:
+    branch: master
+    deploy_on_push: true
+    repo: mlhamel/trieugene
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  name: trieugene-consumer
+  run_command: bin/trieugene consumer
