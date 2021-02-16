@@ -55,5 +55,6 @@ func (r *StoreJob) Run(ctx context.Context, args ...interface{}) error {
 		r.cfg.Logger().Error().Err(err).Msg("An occured while running StoreJob")
 		return err
 	}
+	r.cfg.Logger().Debug().Msg("Succeed running StoreJob")
 	return nil
 }
