@@ -10,6 +10,7 @@ require (
 	github.com/contribsys/faktory v1.3.0-1
 	github.com/contribsys/faktory_worker_go v1.4.2
 	github.com/gorilla/mux v1.8.0
+	github.com/mitchellh/mapstructure v1.4.1
 	github.com/pior/runnable v0.8.0
 	github.com/rs/zerolog v1.20.0
 	github.com/stretchr/testify v1.6.1

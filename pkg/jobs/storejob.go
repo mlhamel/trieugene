@@ -2,8 +2,8 @@ package jobs
 
 import (
 	"context"
-	"encoding/json"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/mlhamel/trieugene/pkg/config"
 	"github.com/mlhamel/trieugene/pkg/store"
 )
@@ -20,28 +20,35 @@ func NewStoreJob(cfg *config.Config, store store.Store) Job {
 	}
 }
 
+type dataTemp struct {
+	data []interface{}
+}
+
 func (r *StoreJob) Perform(ctx context.Context, args ...interface{}) error {
 	r.cfg.Logger().Debug().Msgf("Running StoreJob with args %v", args)
 
 	for a := range args {
-		var msg = Message{}
-		jsonString, err := json.Marshal(args[a])
-		if err != nil {
-			r.cfg.Logger().Error().Msgf("Invalid message '%s': %w", args[a], err)
+		var msg Message
+		data, ok := args[a].([]interface{})
+		if !ok {
+			r.cfg.Logger().Error().Err(ErrInvalidMsg).Msg("Invalid message")
 			return ErrInvalidMsg
 		}
 
-		json.Unmarshal(jsonString, &msg)
-
-		r.cfg.Logger().Debug().Msg("Unmarshaling data for persistence")
-		var data interface{}
-		err = json.Unmarshal([]byte(msg.Data), &data)
-		if err != nil {
-			return ErrInvalidData
+		raw, ok := data[0].(map[string]interface{})
+		if !ok {
+			r.cfg.Logger().Error().Err(ErrInvalidMsg).Msg("Invalid message")
+			return ErrInvalidMsg
 		}
 
-		r.cfg.Logger().Debug().Msgf("Persisting data for %d processedAt %s", msg.ID, msg.ProcessedAt.String())
-		if err := r.store.Persist(ctx, msg.ProcessedAt, msg.Kind, msg.ID, data); err != nil {
+		err := mapstructure.Decode(raw, &msg)
+		if err != nil {
+			return err
+		}
+
+		r.cfg.Logger().Debug().Str("id", msg.ID).Msg("Persisting data")
+		if err := r.store.Persist(ctx, msg.ProcessedAt, msg.Kind, msg.ID, msg.Data); err != nil {
+			r.cfg.Logger().Error().Err(err).Msg("Error while trying to persist data")
 			return err
 		}
 	}

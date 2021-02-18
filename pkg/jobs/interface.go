@@ -11,7 +11,7 @@ type Job interface {
 
 type Manager interface {
 	Register(string, Job) error
-	Perform(string, Job, ...interface{}) error
+	Perform(string, Job, *Message) error
 	Run(context.Context) error
 }
 

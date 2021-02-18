@@ -17,7 +17,7 @@ type Faktory struct {
 
 func NewFaktory(cfg *config.Config, store store.Store) runnable.Runnable {
 	manager := jobs.NewFaktoryManager(cfg)
-	manager.Register("outflow-rouge", jobs.NewStoreJob(cfg, store))
+	manager.Register("rougecombien", jobs.NewStoreJob(cfg, store))
 
 	return &Faktory{
 		cfg:     cfg,
