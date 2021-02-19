@@ -42,7 +42,12 @@ func (s *S3) Persist(ctx context.Context, timestamp time.Time, name string, id s
 		Key:    aws.String(buildKey(name, timestamp.Unix(), id)),
 		Body:   strings.NewReader(fmt.Sprintf("%v", data)),
 	})
+	if err != nil {
+		s.cfg.Logger().Error().Err(err).Msgf("Persisting %s/%s: Failed", name, id)
+		return err
+	}
+
 	s.cfg.Logger().Debug().Msgf("Persisting %s/%s: Succeed", name, id)
 
-	return err
+	return nil
 }
