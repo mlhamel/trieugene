@@ -7,5 +7,6 @@ up:
       modules: true
   - railgun
 commands:
-  trieugene: go build -o bin/trieugene cmd/trieugene/main.go
-  rougecombien: go build -o bin/rougecombien services/rougecombien/cmd/rougecombien/main.go
+  build: make build
+  rougecombien: go run services/rougecombien/cmd/rougecombien/main.go dev
+  trieugene: go run cmd/trieugene/main.go dev
