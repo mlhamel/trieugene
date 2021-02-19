@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -32,6 +33,27 @@ func NewS3(cfg *config.Config) Store {
 	client := s3.New(session.New(&conf))
 
 	return &S3{cfg: cfg, client: client}
+}
+
+func (s *S3) Setup(ctx context.Context) error {
+	s.cfg.Logger().Debug().Msgf("Creating bucket %s", s.cfg.S3Bucket())
+	input := &s3.CreateBucketInput{Bucket: aws.String(s.cfg.S3Bucket())}
+	_, err := s.client.CreateBucket(input)
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			case s3.ErrCodeBucketAlreadyExists:
+			case s3.ErrCodeBucketAlreadyOwnedByYou:
+				err = nil
+			default:
+				return aerr
+			}
+		} else {
+			return err
+		}
+	}
+	s.cfg.Logger().Debug().Msgf("Creating bucket %s: Succeed", s.cfg.S3Bucket())
+	return nil
 }
 
 func (s *S3) Persist(ctx context.Context, timestamp time.Time, name string, id string, data interface{}) error {

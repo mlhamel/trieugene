@@ -27,6 +27,8 @@ type dataTemp struct {
 func (r *StoreJob) Perform(ctx context.Context, args ...interface{}) error {
 	r.cfg.Logger().Debug().Msgf("Running StoreJob with args %v", args)
 
+	r.store.Setup(ctx)
+
 	for a := range args {
 		var msg Message
 		data, ok := args[a].([]interface{})
