@@ -63,8 +63,12 @@ func (c *Config) S3Bucket() string {
 	return GetEnv("TRIEUGENE_S3_BUCKET", "trieugene")
 }
 
-func (c *Config) S3Key() string {
-	return GetEnv("TRIEUGENE_S3_KEY", "trieugene_key")
+func (c *Config) S3AccessKey() string {
+	return GetEnv("TRIEUGENE_S3_ACCESS_KEY", "trieugene_key")
+}
+
+func (c *Config) S3SecretKey() string {
+	return GetEnv("TRIEUGENE_S3_SECRET_KEY", "trieugene_secret_key")
 }
 
 func (c *Config) S3URL() string {
@@ -72,7 +76,7 @@ func (c *Config) S3URL() string {
 }
 
 func (c *Config) S3Region() string {
-	return GetEnv("TRIEUGENE_S3_REGION", "us-west-2")
+	return GetEnv("TRIEUGENE_S3_REGION", "us-east-1")
 }
 
 func (c *Config) HTTPPort() int {

@@ -22,7 +22,7 @@ const shortDuration = 100 * time.Millisecond
 
 func NewS3(cfg *config.Config) Store {
 	conf := aws.Config{
-		Credentials:      credentials.NewStaticCredentials("id", "secret", "token"),
+		Credentials:      credentials.NewStaticCredentials(cfg.S3AccessKey(), cfg.S3SecretKey(), ""),
 		Endpoint:         aws.String(cfg.S3URL()),
 		Region:           aws.String(cfg.S3Region()),
 		DisableSSL:       aws.Bool(true),
