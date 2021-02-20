@@ -35,6 +35,13 @@ func NewConfig() *Config {
 	}
 }
 
+type environmentType string
+
+const (
+	Production  environmentType = "Production"
+	Development environmentType = "Development"
+)
+
 func (c *Config) ProjectID() string {
 	return GetEnv("GOOGLE_CLOUD_PROJECT", "trieugene")
 }
@@ -57,6 +64,10 @@ func (c *Config) FaktoryURL() string {
 
 func (c *Config) GCSURL() string {
 	return "trieugene.myshopify.io:4443"
+}
+
+func (c *Config) Environment() environmentType {
+	return environmentType(GetEnv("TRIEUGENE_ENVIRONMENT", string(Development)))
 }
 
 func (c *Config) S3Bucket() string {
