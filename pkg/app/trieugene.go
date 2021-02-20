@@ -42,7 +42,7 @@ func NewTrieugeneStore(cfg *config.Config, kind string, key string, value string
 }
 
 func (t *trieugene) Run(ctx context.Context) error {
-	store := store.NewS3(t.cfg)
+	store := store.NewS3Production(t.cfg)
 	err := NewFaktory(t.cfg, store).Run(ctx)
 
 	return err

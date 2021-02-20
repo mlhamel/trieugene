@@ -35,6 +35,18 @@ func NewS3(cfg *config.Config) Store {
 	return &S3{cfg: cfg, client: client}
 }
 
+func NewS3Production(cfg *config.Config) Store {
+	conf := aws.Config{
+		Credentials: credentials.NewStaticCredentials(cfg.S3AccessKey(), cfg.S3SecretKey(), ""),
+		Endpoint:    aws.String(cfg.S3URL()),
+		Region:      aws.String(cfg.S3Region()),
+	}
+
+	client := s3.New(session.New(&conf))
+
+	return &S3{cfg: cfg, client: client}
+}
+
 func (s *S3) Setup(ctx context.Context) error {
 	s.cfg.Logger().Debug().Msgf("Creating bucket %s", s.cfg.S3Bucket())
 	input := &s3.CreateBucketInput{Bucket: aws.String(s.cfg.S3Bucket())}
