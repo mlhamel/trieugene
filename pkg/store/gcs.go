@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"time"
 
 	"cloud.google.com/go/storage"
 	"github.com/mlhamel/trieugene/pkg/config"
@@ -41,9 +40,9 @@ func (g *GoogleCloudStorage) Setup(ctx context.Context) error {
 	return g.bucket.Create(ctx, g.cfg.ProjectID(), nil)
 }
 
-func (g *GoogleCloudStorage) Persist(ctx context.Context, timestamp time.Time, name string, id string, data interface{}) error {
+func (g *GoogleCloudStorage) Persist(ctx context.Context, timestamp int64, name string, id string, data interface{}) error {
 	g.cfg.Logger().Debug().Msgf("Store/GoogleCloudStorage/Persist: Start")
-	fileName := buildKey(name, timestamp.Unix(), id)
+	fileName := buildKey(name, timestamp, id)
 	object := g.bucket.Object(fileName)
 	w := object.NewWriter(ctx)
 	reader := bytes.NewReader([]byte(fmt.Sprintf("%v", data)))

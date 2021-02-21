@@ -68,20 +68,22 @@ func (s *S3) Setup(ctx context.Context) error {
 	return nil
 }
 
-func (s *S3) Persist(ctx context.Context, timestamp time.Time, name string, id string, data interface{}) error {
+func (s *S3) Persist(ctx context.Context, timestamp int64, name string, id string, data interface{}) error {
 	ctx = context.Background()
-	s.cfg.Logger().Debug().Msgf("Persisting %s/%s: %s", name, id, data)
+	key := fmt.Sprintf("%s/%d/%s", name, timestamp, id)
+
+	s.cfg.Logger().Debug().Msgf("Persisting %s", key)
 	_, err := s.client.PutObjectWithContext(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(s.cfg.S3Bucket()),
-		Key:    aws.String(buildKey(name, timestamp.Unix(), id)),
+		Key:    aws.String(key),
 		Body:   strings.NewReader(fmt.Sprintf("%v", data)),
 	})
 	if err != nil {
-		s.cfg.Logger().Error().Err(err).Msgf("Persisting %s/%s: Failed", name, id)
+		s.cfg.Logger().Error().Err(err).Msgf("Persisting %s: Failed", key)
 		return err
 	}
 
-	s.cfg.Logger().Debug().Msgf("Persisting %s/%s: Succeed", name, id)
+	s.cfg.Logger().Debug().Msgf("Persisting %s: Succeed", key)
 
 	return nil
 }

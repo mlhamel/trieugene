@@ -2,7 +2,6 @@ package jobs
 
 import (
 	"context"
-	"time"
 )
 
 type Job interface {
@@ -16,8 +15,8 @@ type Manager interface {
 }
 
 type Message struct {
-	ProcessedAt time.Time `json:"processed_at"`
-	ID          string    `json:"id"`
-	Kind        string    `json:"kind"`
-	Data        string    `json:"data"`
+	ProcessedAt int64  `json:"processed_at" mapstructure:"processed_at"`
+	ID          string `json:"id"`
+	Kind        string `json:"kind"`
+	Data        string `json:"data"`
 }

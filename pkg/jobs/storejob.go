@@ -41,12 +41,13 @@ func (r *StoreJob) Perform(ctx context.Context, args ...interface{}) error {
 			return ErrInvalidMsg
 		}
 
+		r.cfg.Logger().Debug().Interface("Raw", raw).Msg("Decoding arguments")
 		err := mapstructure.Decode(raw, &msg)
 		if err != nil {
 			return err
 		}
 
-		r.cfg.Logger().Debug().Str("id", msg.ID).Msg("Persisting data")
+		r.cfg.Logger().Debug().Str("id", msg.ID).Int64("ProcessedAt", msg.ProcessedAt).Msg("Persisting data")
 		if err := r.store.Persist(ctx, msg.ProcessedAt, msg.Kind, msg.ID, msg.Data); err != nil {
 			r.cfg.Logger().Error().Err(err).Msg("Error while trying to persist data")
 			return err
