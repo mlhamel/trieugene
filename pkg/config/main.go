@@ -22,6 +22,10 @@ func NewConfig() *Config {
 
 	httpPort, err := strconv.Atoi(GetEnv("PORT", "8080"))
 
+	if err != nil {
+		panic(err)
+	}
+
 	statsd, err := statsd.New("127.0.0.1:8125", statsd.WithNamespace("trieugene."))
 
 	if err != nil {
@@ -42,20 +46,12 @@ const (
 	Development environmentType = "Development"
 )
 
-func (c *Config) ProjectID() string {
-	return GetEnv("GOOGLE_CLOUD_PROJECT", "trieugene")
-}
-
 func (c *Config) BucketName() string {
 	return GetEnv("TRIEUGENE_BUCKET_NAME", "trieugene-storage")
 }
 
-func (c *Config) Logger() *zerolog.Logger {
-	return c.logger
-}
-
-func (c *Config) PubSubURL() string {
-	return "trieugene.myshopify.io:8085"
+func (c *Config) Environment() environmentType {
+	return environmentType(GetEnv("TRIEUGENE_ENVIRONMENT", string(Development)))
 }
 
 func (c *Config) FaktoryURL() string {
@@ -63,11 +59,23 @@ func (c *Config) FaktoryURL() string {
 }
 
 func (c *Config) GCSURL() string {
-	return "trieugene.myshopify.io:4443"
+	return GetEnv("TRIEUGENE_GCS_URL", "trieugene.myshopify.io:4443")
 }
 
-func (c *Config) Environment() environmentType {
-	return environmentType(GetEnv("TRIEUGENE_ENVIRONMENT", string(Development)))
+func (c *Config) HTTPPort() int {
+	return c.httpPort
+}
+
+func (c *Config) Logger() *zerolog.Logger {
+	return c.logger
+}
+
+func (c *Config) ProjectID() string {
+	return GetEnv("GOOGLE_CLOUD_PROJECT", "trieugene")
+}
+
+func (c *Config) PubSubURL() string {
+	return GetEnv("TRIEUGENE_PUBSUB_URL", "trieugene.myshopify.io:8085")
 }
 
 func (c *Config) S3Bucket() string {
@@ -88,8 +96,4 @@ func (c *Config) S3URL() string {
 
 func (c *Config) S3Region() string {
 	return GetEnv("TRIEUGENE_S3_REGION", "us-east-1")
-}
-
-func (c *Config) HTTPPort() int {
-	return c.httpPort
 }
