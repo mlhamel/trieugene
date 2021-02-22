@@ -16,6 +16,7 @@ type Manager interface {
 
 type Message struct {
 	ProcessedAt int64  `json:"processed_at" mapstructure:"processed_at"`
+	HappenedAt  int64  `json:"happened_at" mapstructure:"happened_at"`
 	ID          string `json:"id"`
 	Kind        string `json:"kind"`
 	Data        string `json:"data"`

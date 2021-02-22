@@ -47,8 +47,8 @@ func (r *StoreJob) Perform(ctx context.Context, args ...interface{}) error {
 			return err
 		}
 
-		r.cfg.Logger().Debug().Str("id", msg.ID).Int64("ProcessedAt", msg.ProcessedAt).Msg("Persisting data")
-		if err := r.store.Persist(ctx, msg.ProcessedAt, msg.Kind, msg.ID, msg.Data); err != nil {
+		r.cfg.Logger().Debug().Str("id", msg.ID).Int64("HappenedAt", msg.HappenedAt).Msg("Persisting data")
+		if err := r.store.Persist(ctx, msg.HappenedAt, msg.Kind, msg.ID, msg.Data); err != nil {
 			r.cfg.Logger().Error().Err(err).Msg("Error while trying to persist data")
 			return err
 		}

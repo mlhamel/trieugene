@@ -42,6 +42,7 @@ func (r *Rougecombien) runOutflowJobUsingGCS(ctx context.Context, result scraper
 		ID:          result.Sha1(),
 		Kind:        "rougecombien",
 		ProcessedAt: result.ScrapedAt.Unix(),
+		HappenedAt:  result.TakenAt.Unix(),
 		Data:        fmt.Sprintf("%f", result.Outflow),
 	})
 }
@@ -56,6 +57,7 @@ func (r *Rougecombien) runOutflowJobUsingS3(ctx context.Context, result scraper.
 		ID:          result.Sha1(),
 		Kind:        "rougecombien",
 		ProcessedAt: result.ScrapedAt.Unix(),
+		HappenedAt:  result.TakenAt.Unix(),
 		Data:        fmt.Sprintf("%f", result.Outflow),
 	})
 }
