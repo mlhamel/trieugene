@@ -2,64 +2,46 @@ package apps
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/mlhamel/trieugene/pkg/config"
-	"github.com/mlhamel/trieugene/pkg/jobs"
+	trieugene "github.com/mlhamel/trieugene/pkg/jobs"
 	"github.com/mlhamel/trieugene/pkg/store"
+	"github.com/mlhamel/trieugene/services/rougecombien/pkg/jobs"
 	"github.com/mlhamel/trieugene/services/rougecombien/pkg/scraper"
 	"github.com/pior/runnable"
 )
 
 type Rougecombien struct {
-	cfg *config.Config
+	cfg     *config.Config
+	store   store.Store
+	manager trieugene.Manager
+	job     trieugene.Job
 }
 
 func NewRougecombien() *Rougecombien {
 	cfg := config.NewConfig()
-	return &Rougecombien{cfg: cfg}
+	store := store.NewS3(cfg)
+
+	return &Rougecombien{
+		cfg:     cfg,
+		store:   store,
+		manager: trieugene.NewFaktoryManager(cfg),
+		job:     trieugene.NewStoreJob(cfg, store),
+	}
 }
 
 func (r *Rougecombien) Run(ctx context.Context) error {
-	return scraper.NewScraper(r.cfg, r.runOutflowJobUsingS3).Run(ctx)
+	return scraper.NewScraper(r.cfg, r.genericRun).Run(ctx)
 }
 
 func (r *Rougecombien) RunDevelopment(ctx context.Context) error {
 	run(r.setupDevelopment())
-	return scraper.NewScraper(r.cfg, r.runOutflowJobUsingS3).Run(ctx)
+	return r.manager.Perform("overflow-rougecombien", jobs.NewOverflowjob(r.cfg, r.store, r.manager), &trieugene.Message{})
 }
 
-func (r *Rougecombien) runOutflowJobUsingGCS(ctx context.Context, result scraper.Result) error {
-	manager := jobs.NewFaktoryManager(r.cfg)
-	store, err := store.NewGoogleCloudStorage(ctx, r.cfg)
-	if err != nil {
-		return err
-	}
-	job := jobs.NewStoreJob(r.cfg, store)
-
-	return manager.Perform("rougecombien", job, &jobs.Message{
-		ID:          result.Sha1(),
-		Kind:        "rougecombien",
-		ProcessedAt: result.ScrapedAt.Unix(),
-		HappenedAt:  result.TakenAt.Unix(),
-		Data:        fmt.Sprintf("%f", result.Outflow),
-	})
-}
-
-func (r *Rougecombien) runOutflowJobUsingS3(ctx context.Context, result scraper.Result) error {
-	r.cfg.Logger().Info().Msg("Running outflow using S3 store.")
-
-	store := store.NewS3(r.cfg)
-	manager := jobs.NewFaktoryManager(r.cfg)
-	job := jobs.NewStoreJob(r.cfg, store)
-	return manager.Perform("rougecombien", job, &jobs.Message{
-		ID:          result.Sha1(),
-		Kind:        "rougecombien",
-		ProcessedAt: result.ScrapedAt.Unix(),
-		HappenedAt:  result.TakenAt.Unix(),
-		Data:        fmt.Sprintf("%f", result.Outflow),
-	})
+func (r *Rougecombien) genericRun(ctx context.Context, result scraper.Result) error {
+	return r.manager.Perform("overflow-rougecombien", jobs.NewOverflowjob(r.cfg, r.store, r.manager), &trieugene.Message{})
 }
 
 func (r *Rougecombien) setupDevelopment() runnable.Runnable {

@@ -6,6 +6,7 @@ import (
 	"github.com/mlhamel/trieugene/pkg/config"
 	"github.com/mlhamel/trieugene/pkg/jobs"
 	"github.com/mlhamel/trieugene/pkg/store"
+	rougecombien "github.com/mlhamel/trieugene/services/rougecombien/pkg/jobs"
 	"github.com/pior/runnable"
 )
 
@@ -17,7 +18,8 @@ type Faktory struct {
 
 func NewFaktory(cfg *config.Config, store store.Store) runnable.Runnable {
 	manager := jobs.NewFaktoryManager(cfg)
-	manager.Register("rougecombien", jobs.NewStoreJob(cfg, store))
+	manager.Register("store-rougecombien", jobs.NewStoreJob(cfg, store))
+	manager.Register("overflow-rougecombien", rougecombien.NewOverflowjob(cfg, store, manager))
 
 	return &Faktory{
 		cfg:     cfg,
