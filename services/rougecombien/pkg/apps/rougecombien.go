@@ -13,19 +13,18 @@ import (
 )
 
 type Rougecombien struct {
-	cfg     *config.Config
-	store   store.Store
-	manager trieugene.Manager
+	cfg      *config.Config
+	storeJob trieugene.Job
+	manager  trieugene.Manager
 }
 
-func NewRougecombien() *Rougecombien {
-	cfg := config.NewConfig()
+func NewRougecombien(cfg *config.Config) *Rougecombien {
 	store := store.NewS3(cfg)
 
 	return &Rougecombien{
-		cfg:     cfg,
-		store:   store,
-		manager: trieugene.NewFaktoryManager(cfg),
+		cfg:      cfg,
+		storeJob: trieugene.NewStoreJob("store-rougecombien", cfg, store),
+		manager:  trieugene.NewFaktoryManager(cfg),
 	}
 }
 
@@ -35,11 +34,12 @@ func (r *Rougecombien) Run(ctx context.Context) error {
 
 func (r *Rougecombien) RunDevelopment(ctx context.Context) error {
 	run(r.setupDevelopment())
-	return r.manager.Perform(jobs.NewOverflowjob(r.cfg, r.store, r.manager), &trieugene.Message{})
+
+	return r.manager.Perform(jobs.NewOverflowjob(r.cfg, r.manager, r.storeJob), &trieugene.Message{})
 }
 
 func (r *Rougecombien) genericRun(ctx context.Context, result scraper.Result) error {
-	return r.manager.Perform(jobs.NewOverflowjob(r.cfg, r.store, r.manager), &trieugene.Message{})
+	return r.manager.Perform(jobs.NewOverflowjob(r.cfg, r.manager, r.storeJob), &trieugene.Message{})
 }
 
 func (r *Rougecombien) setupDevelopment() runnable.Runnable {

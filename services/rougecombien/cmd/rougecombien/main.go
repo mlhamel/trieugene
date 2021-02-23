@@ -4,12 +4,14 @@ import (
 	"context"
 	"os"
 
+	"github.com/mlhamel/trieugene/pkg/config"
 	"github.com/mlhamel/trieugene/services/rougecombien/pkg/apps"
 	"github.com/urfave/cli"
 )
 
 func main() {
-	rougecombien := apps.NewRougecombien()
+	cfg := config.NewConfig()
+	rougecombien := apps.NewRougecombien(cfg)
 
 	cliApp := cli.App{
 		Name: "rougecombien",

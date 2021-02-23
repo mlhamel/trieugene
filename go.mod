@@ -9,11 +9,12 @@ require (
 	github.com/aws/aws-sdk-go v1.36.28
 	github.com/contribsys/faktory v1.3.0-1
 	github.com/contribsys/faktory_worker_go v1.4.2
+	github.com/go-co-op/gocron v0.6.0
 	github.com/gorilla/mux v1.8.0
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/pior/runnable v0.8.0
 	github.com/rs/zerolog v1.20.0
-	github.com/stretchr/testify v1.6.1
+	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli v1.22.5
 	golang.org/x/tools v0.0.0-20201110124207-079ba7bd75cd // indirect
 	google.golang.org/api v0.35.0 // indirect

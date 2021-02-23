@@ -6,23 +6,20 @@ import (
 
 	"github.com/mlhamel/trieugene/pkg/config"
 	trieugene "github.com/mlhamel/trieugene/pkg/jobs"
-	"github.com/mlhamel/trieugene/pkg/store"
 	"github.com/mlhamel/trieugene/services/rougecombien/pkg/scraper"
 )
 
 type OverflowJob struct {
-	cfg     *config.Config
-	store   store.Store
-	manager trieugene.Manager
-	job     trieugene.Job
+	cfg      *config.Config
+	manager  trieugene.Manager
+	storejob trieugene.Job
 }
 
-func NewOverflowjob(cfg *config.Config, store store.Store, manager trieugene.Manager) trieugene.Job {
+func NewOverflowjob(cfg *config.Config, manager trieugene.Manager, storejob trieugene.Job) trieugene.Job {
 	return &OverflowJob{
-		cfg:     cfg,
-		store:   store,
-		manager: manager,
-		job:     trieugene.NewStoreJob("store-rougecombien", cfg, store),
+		cfg:      cfg,
+		manager:  manager,
+		storejob: storejob,
 	}
 }
 
@@ -32,9 +29,9 @@ func (o *OverflowJob) Kind() string {
 
 func (o *OverflowJob) Perform(ctx context.Context, args ...interface{}) error {
 	scraper.NewScraper(o.cfg, func(ctx context.Context, result scraper.Result) error {
-		return o.manager.Perform(o.job, &trieugene.Message{
+		return o.manager.Perform(o.storejob, &trieugene.Message{
 			ID:          result.Sha1(),
-			Kind:        o.job.Kind(),
+			Kind:        o.storejob.Kind(),
 			ProcessedAt: result.ScrapedAt.Unix(),
 			HappenedAt:  result.TakenAt.Unix(),
 			Data:        fmt.Sprintf("%f", result.Outflow),
