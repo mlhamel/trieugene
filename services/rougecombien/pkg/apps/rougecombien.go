@@ -16,7 +16,6 @@ type Rougecombien struct {
 	cfg     *config.Config
 	store   store.Store
 	manager trieugene.Manager
-	job     trieugene.Job
 }
 
 func NewRougecombien() *Rougecombien {
@@ -27,7 +26,6 @@ func NewRougecombien() *Rougecombien {
 		cfg:     cfg,
 		store:   store,
 		manager: trieugene.NewFaktoryManager(cfg),
-		job:     trieugene.NewStoreJob(cfg, store),
 	}
 }
 
@@ -37,11 +35,11 @@ func (r *Rougecombien) Run(ctx context.Context) error {
 
 func (r *Rougecombien) RunDevelopment(ctx context.Context) error {
 	run(r.setupDevelopment())
-	return r.manager.Perform("overflow-rougecombien", jobs.NewOverflowjob(r.cfg, r.store, r.manager), &trieugene.Message{})
+	return r.manager.Perform(jobs.NewOverflowjob(r.cfg, r.store, r.manager), &trieugene.Message{})
 }
 
 func (r *Rougecombien) genericRun(ctx context.Context, result scraper.Result) error {
-	return r.manager.Perform("overflow-rougecombien", jobs.NewOverflowjob(r.cfg, r.store, r.manager), &trieugene.Message{})
+	return r.manager.Perform(jobs.NewOverflowjob(r.cfg, r.store, r.manager), &trieugene.Message{})
 }
 
 func (r *Rougecombien) setupDevelopment() runnable.Runnable {

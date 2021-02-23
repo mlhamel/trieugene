@@ -9,15 +9,21 @@ import (
 )
 
 type StoreJob struct {
+	kind  string
 	cfg   *config.Config
 	store store.Store
 }
 
-func NewStoreJob(cfg *config.Config, store store.Store) Job {
+func NewStoreJob(kind string, cfg *config.Config, store store.Store) Job {
 	return &StoreJob{
+		kind:  kind,
 		cfg:   cfg,
 		store: store,
 	}
+}
+
+func (r *StoreJob) Kind() string {
+	return r.kind
 }
 
 type dataTemp struct {

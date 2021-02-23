@@ -21,15 +21,15 @@ func NewFaktoryManager(cfg *config.Config) Manager {
 	return &FaktoryManager{cfg: cfg, manager: manager}
 }
 
-func (f *FaktoryManager) Register(kind string, job Job) error {
-	f.manager.Register(kind, job.Run)
+func (f *FaktoryManager) Register(job Job) error {
+	f.manager.Register(job.Kind(), job.Run)
 	return nil
 }
 
-func (f *FaktoryManager) Perform(kind string, job Job, msg *Message) error {
-	f.cfg.Logger().Debug().Msgf("Instanciating job %s with args %v", kind, msg)
+func (f *FaktoryManager) Perform(job Job, msg *Message) error {
+	f.cfg.Logger().Debug().Msgf("Instanciating job %s with args %v", job.Kind(), msg)
 
-	instance := faktory.NewJob(kind, msg)
+	instance := faktory.NewJob(job.Kind(), msg)
 	client, err := f.faktoryClientInstance()
 	if err != nil {
 		return err

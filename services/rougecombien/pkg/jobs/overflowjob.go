@@ -22,15 +22,19 @@ func NewOverflowjob(cfg *config.Config, store store.Store, manager trieugene.Man
 		cfg:     cfg,
 		store:   store,
 		manager: manager,
-		job:     trieugene.NewStoreJob(cfg, store),
+		job:     trieugene.NewStoreJob("store-rougecombien", cfg, store),
 	}
+}
+
+func (o *OverflowJob) Kind() string {
+	return "overflow-rougecombien"
 }
 
 func (o *OverflowJob) Perform(ctx context.Context, args ...interface{}) error {
 	scraper.NewScraper(o.cfg, func(ctx context.Context, result scraper.Result) error {
-		return o.manager.Perform("store-rougecombien", o.job, &trieugene.Message{
+		return o.manager.Perform(o.job, &trieugene.Message{
 			ID:          result.Sha1(),
-			Kind:        "store-rougecombien",
+			Kind:        o.job.Kind(),
 			ProcessedAt: result.ScrapedAt.Unix(),
 			HappenedAt:  result.TakenAt.Unix(),
 			Data:        fmt.Sprintf("%f", result.Outflow),
