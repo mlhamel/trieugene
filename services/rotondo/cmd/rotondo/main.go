@@ -6,7 +6,7 @@ import (
 	"os/signal"
 
 	"github.com/mlhamel/trieugene/pkg/config"
-	"github.com/mlhamel/trieugene/services/rotondo/cmd/rotondo/pkg/apps"
+	"github.com/mlhamel/trieugene/services/rotondo/pkg/apps"
 	"github.com/urfave/cli"
 )
 
