@@ -71,7 +71,7 @@ func (s *S3) Setup(ctx context.Context) error {
 func (s *S3) Persist(ctx context.Context, timestamp int64, name string, id string, data interface{}) error {
 	ctx = context.Background()
 	datetime := time.Unix(timestamp, 0)
-	key := fmt.Sprintf("%s/%s/%s.json", name, datetime.Format("20060102150405"), id)
+	key := fmt.Sprintf("%s/%s/%s.json", name, datetime.Format("200601021504"), id)
 
 	s.cfg.Logger().Debug().Msgf("Persisting %s", key)
 	_, err := s.client.PutObjectWithContext(ctx, &s3.PutObjectInput{
