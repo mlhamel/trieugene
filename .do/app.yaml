@@ -1,8 +1,7 @@
 name: trieugene
 region: nyc
 services:
-- envs:
-  http_port: 7420
+- http_port: 7420
   image:
     registry_type: DOCR
     repository: faktory
@@ -26,6 +25,20 @@ workers:
   - key: FAKTORY_PROVIDER
     scope: RUN_AND_BUILD_TIME
     value: FAKTORY_URL
+  - key: TRIEUGENE_S3_ACCESS_KEY
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+    value: EV[1:Z9nqSM+Z12DcOi0uuwVy+0Cbj51526vT:moSkJtAAPoUiInwtiZSHCCCcZb1UEVPCFb1em0RHbFK6Wcvb]
+  - key: TRIEUGENE_S3_SECRET_KEY
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+    value: EV[1:TKexE47whIwoY06P+oQs7JhjpAYqE8YL:z/ktjxBfur5mJv9A7IQOzw0DE9XJ1JhlCKn+e4VSZ+qqw4vplvCooEtbGZJebDC2t2cRH2sFNMZ+BJQ=]
+  - key: TRIEUGENE_S3_URL
+    scope: RUN_AND_BUILD_TIME
+    value: nyc3.digitaloceanspaces.com
+  - key: TRIEUGENE_S3_REGION
+    scope: RUN_AND_BUILD_TIME
+    value: us-east-1
   github:
     branch: master
     deploy_on_push: true
@@ -34,3 +47,22 @@ workers:
   instance_size_slug: basic-xxs
   name: trieugene-consumer
   run_command: bin/trieugene consumer
+- environment_slug: go
+  envs:
+  - key: TRIEUGENE_FAKTORY_URL
+    scope: RUN_AND_BUILD_TIME
+    value: tcp://faktory:7419
+  - key: FAKTORY_URL
+    scope: RUN_AND_BUILD_TIME
+    value: tcp://faktory:7419
+  - key: FAKTORY_PROVIDER
+    scope: RUN_AND_BUILD_TIME
+    value: FAKTORY_URL
+  github:
+    branch: master
+    deploy_on_push: true
+    repo: mlhamel/trieugene
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  name: rotondo
+  run_command: bin/rotondo
