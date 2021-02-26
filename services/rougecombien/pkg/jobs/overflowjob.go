@@ -2,7 +2,7 @@ package jobs
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
 
 	"github.com/mlhamel/trieugene/pkg/config"
 	trieugene "github.com/mlhamel/trieugene/pkg/jobs"
@@ -13,6 +13,12 @@ type OverflowJob struct {
 	cfg      *config.Config
 	manager  trieugene.Manager
 	storejob trieugene.Job
+}
+
+type data struct {
+	Kind       string  `json:"kind"`
+	Overflow   float64 `json:"overflow"`
+	HappenedAt int64   `json:"happened_at"`
 }
 
 func NewOverflowjob(cfg *config.Config, manager trieugene.Manager, storejob trieugene.Job) trieugene.Job {
@@ -29,12 +35,17 @@ func (o *OverflowJob) Kind() string {
 
 func (o *OverflowJob) Perform(ctx context.Context, args ...interface{}) error {
 	scraper.NewScraper(o.cfg, func(ctx context.Context, result scraper.Result) error {
+		bytes, err := json.Marshal(data{Kind: o.Kind(), Overflow: result.Outflow, HappenedAt: result.TakenAt.Unix()})
+		if err != nil {
+			return err
+		}
+
 		return o.manager.Perform(o.storejob, &trieugene.Message{
 			ID:          result.Sha1(),
 			Kind:        o.storejob.Kind(),
 			ProcessedAt: result.ScrapedAt.Unix(),
 			HappenedAt:  result.TakenAt.Unix(),
-			Data:        fmt.Sprintf("%f", result.Outflow),
+			Data:        string(bytes),
 		})
 	}).Run(ctx)
 	return nil
