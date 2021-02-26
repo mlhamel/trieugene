@@ -50,6 +50,7 @@ func (r *StoreJob) Perform(ctx context.Context, args ...interface{}) error {
 		r.cfg.Logger().Debug().Interface("Raw", raw).Msg("Decoding arguments")
 		err := mapstructure.Decode(raw, &msg)
 		if err != nil {
+			r.cfg.Logger().Error().Err(err).Msg("Error while trying to decode arguments")
 			return err
 		}
 
