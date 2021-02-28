@@ -2,10 +2,12 @@ package scraper
 
 import (
 	"context"
+	"crypto/md5"
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/csv"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -30,12 +32,21 @@ type Result struct {
 
 func (r *Result) Sha1() string {
 	hasher := sha1.New()
-	_, err := hasher.Write([]byte(fmt.Sprintf("%f", r.Outflow)))
+	_, err := hasher.Write([]byte(fmt.Sprintf("%d:%f", r.TakenAt, r.Outflow)))
 	if err != nil {
 		return ""
 	}
 
 	return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+}
+
+func (r *Result) MD5() string {
+	hasher := md5.New()
+	_, err := io.WriteString(hasher, fmt.Sprintf("%d:%f", r.TakenAt, r.Outflow))
+	if err != nil {
+		return ""
+	}
+	return string(hasher.Sum(nil))
 }
 
 func NewScraper(cfg *config.Config, consumer func(context.Context, Result) error) *Scraper {
