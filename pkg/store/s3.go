@@ -74,9 +74,10 @@ func (s *S3) Persist(ctx context.Context, timestamp int64, name string, id strin
 
 	s.cfg.Logger().Debug().Msgf("Persisting %s", key)
 	_, err := s.client.PutObjectWithContext(ctx, &s3.PutObjectInput{
-		Bucket: aws.String(s.cfg.S3Bucket()),
-		Key:    aws.String(key),
-		Body:   strings.NewReader(fmt.Sprintf("%v", data)),
+		Bucket:      aws.String(s.cfg.S3Bucket()),
+		Key:         aws.String(key),
+		Body:        strings.NewReader(fmt.Sprintf("%v", data)),
+		ContentType: aws.String("application/json"),
 	})
 	if err != nil {
 		s.cfg.Logger().Error().Err(err).Msgf("Persisting %s: Failed", key)
