@@ -70,13 +70,14 @@ func (s *S3) Setup(ctx context.Context) error {
 
 func (s *S3) Persist(ctx context.Context, timestamp int64, name string, id string, data interface{}) error {
 	datetime := time.Unix(timestamp, 0)
-	key := fmt.Sprintf("%s/%s/%s.json", name, datetime.Format("200601021504"), datetime.Format("1504"))
+	key := fmt.Sprintf("%s/%s/%s.json", name, datetime.Format("20060102"), datetime.Format("1504"))
 
 	s.cfg.Logger().Debug().Msgf("Persisting %s", key)
 	_, err := s.client.PutObjectWithContext(ctx, &s3.PutObjectInput{
 		Bucket:      aws.String(s.cfg.S3Bucket()),
 		Key:         aws.String(key),
 		Body:        strings.NewReader(fmt.Sprintf("%v", data)),
+		GrantRead:   aws.String("GrantRead"),
 		ContentType: aws.String("application/json"),
 	})
 	if err != nil {
