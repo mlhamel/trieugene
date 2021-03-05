@@ -61,7 +61,7 @@ func (r *StoreJob) Perform(ctx context.Context, args ...interface{}) error {
 		}
 	}
 
-	r.cfg.Logger().Debug().Msgf("Done processing StoreJob with args %v", args)
+	r.cfg.Logger().Debug().Interface("args", args).Msg("Done processing StoreJob")
 	return nil
 }
 

@@ -72,7 +72,7 @@ func (s *S3) Persist(ctx context.Context, timestamp int64, name string, id strin
 	datetime := time.Unix(timestamp, 0)
 	key := fmt.Sprintf("%s/%s/%s.json", name, datetime.Format("20060102"), datetime.Format("1504"))
 
-	s.cfg.Logger().Debug().Msgf("Persisting %s", key)
+	s.cfg.Logger().Debug().Str("key", key).Msg("Starting Persistence")
 	_, err := s.client.PutObjectWithContext(ctx, &s3.PutObjectInput{
 		Bucket:      aws.String(s.cfg.S3Bucket()),
 		Key:         aws.String(key),
@@ -81,11 +81,11 @@ func (s *S3) Persist(ctx context.Context, timestamp int64, name string, id strin
 		ContentType: aws.String("application/json"),
 	})
 	if err != nil {
-		s.cfg.Logger().Error().Err(err).Msgf("Persisting %s: Failed", key)
+		s.cfg.Logger().Error().Err(err).Str("key", key).Msg("Failed persistence")
 		return err
 	}
 
-	s.cfg.Logger().Debug().Msgf("Persisting %s: Succeed", key)
+	s.cfg.Logger().Debug().Str("key", key).Msg("Succeed Persistence")
 
 	return nil
 }
