@@ -48,7 +48,7 @@ func NewS3Production(cfg *config.Config) Store {
 }
 
 func (s *S3) Setup(ctx context.Context) error {
-	s.cfg.Logger().Debug().Msgf("Creating bucket %s", s.cfg.S3Bucket())
+	s.cfg.Logger().Debug().Str("bucket", s.cfg.S3Bucket()).Msg("Starting Creating bucket")
 	input := &s3.CreateBucketInput{Bucket: aws.String(s.cfg.S3Bucket())}
 	_, err := s.client.CreateBucket(input)
 	if err != nil {
@@ -64,7 +64,7 @@ func (s *S3) Setup(ctx context.Context) error {
 			return err
 		}
 	}
-	s.cfg.Logger().Debug().Msgf("Creating bucket %s: Succeed", s.cfg.S3Bucket())
+	s.cfg.Logger().Debug().Str("bucket", s.cfg.S3Bucket()).Msg("Succeed Creating bucket")
 	return nil
 }
 
