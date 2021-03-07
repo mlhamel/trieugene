@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -68,15 +69,21 @@ func (s *S3) Setup(ctx context.Context) error {
 	return nil
 }
 
-func (s *S3) Persist(ctx context.Context, timestamp int64, name string, id string, data interface{}) error {
-	datetime := time.Unix(timestamp, 0)
-	key := fmt.Sprintf("%s/%s/%s.json", name, datetime.Format("20060102"), datetime.Format("1504"))
+func (s *S3) Persist(ctx context.Context, data *Data) error {
+	datetime := time.Unix(data.Timestamp, 0)
+	key := fmt.Sprintf("%s/%s/%s.json", data.Name, datetime.Format("20060102"), datetime.Format("1504"))
+	body, err := json.Marshal(data)
+
+	if err != nil {
+		s.cfg.Logger().Error().Err(err).Str("key", key).Msg("Failed marshaling data for persistence")
+		return err
+	}
 
 	s.cfg.Logger().Debug().Str("key", key).Msg("Starting Persistence")
-	_, err := s.client.PutObjectWithContext(ctx, &s3.PutObjectInput{
+	_, err = s.client.PutObjectWithContext(ctx, &s3.PutObjectInput{
 		Bucket:      aws.String(s.cfg.S3Bucket()),
 		Key:         aws.String(key),
-		Body:        strings.NewReader(fmt.Sprintf("%v", data)),
+		Body:        strings.NewReader(fmt.Sprintf("%v", body)),
 		GrantRead:   aws.String("GrantRead"),
 		ContentType: aws.String("application/json"),
 	})

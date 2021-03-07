@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/DataDog/datadog-go/statsd"
 	"github.com/rs/zerolog"
 )
 
@@ -13,7 +12,6 @@ import (
 type Config struct {
 	httpPort int
 	logger   *zerolog.Logger
-	statsd   *statsd.Client
 }
 
 func NewConfig() *Config {
@@ -26,16 +24,9 @@ func NewConfig() *Config {
 		panic(err)
 	}
 
-	statsd, err := statsd.New("127.0.0.1:8125", statsd.WithNamespace("trieugene."))
-
-	if err != nil {
-		panic(err)
-	}
-
 	return &Config{
 		httpPort: httpPort,
 		logger:   &logger,
-		statsd:   statsd,
 	}
 }
 
@@ -96,4 +87,8 @@ func (c *Config) S3URL() string {
 
 func (c *Config) S3Region() string {
 	return GetEnv("TRIEUGENE_S3_REGION", "us-east-1")
+}
+
+func (c *Config) StatsdURL() string {
+	return GetEnv("TRIEUGENE_STATSD_URL", "127.0.0.1:8125")
 }

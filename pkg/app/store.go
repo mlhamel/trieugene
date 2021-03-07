@@ -39,7 +39,12 @@ func (s *Store) Run(ctx context.Context) error {
 		return fmt.Errorf("Error while unmarshaling value (%s): %w", s.value, err)
 	}
 
-	err = s.store.Persist(context.Background(), time.Now().Unix(), s.kind, s.key, result)
+	err = s.store.Persist(context.Background(), &store.Data{
+		Timestamp: time.Now().Unix(),
+		Name:      s.kind,
+		ID:        s.key,
+		Value:     result,
+	})
 	if err != nil {
 		return err
 	}
