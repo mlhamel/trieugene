@@ -29,7 +29,7 @@ func NewRougecombien(cfg *config.Config) *Rougecombien {
 }
 
 func (r *Rougecombien) Run(ctx context.Context) error {
-	return scraper.NewScraper(r.cfg, r.genericRun).Run(ctx)
+	return r.manager.Perform(jobs.NewOverflowjob(r.cfg, r.manager, r.storeJob), &trieugene.Message{})
 }
 
 func (r *Rougecombien) RunDevelopment(ctx context.Context) error {
