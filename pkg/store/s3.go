@@ -83,11 +83,9 @@ func (s *S3) Persist(ctx context.Context, data *Data) error {
 
 	s.cfg.Logger().Debug().Str("key", key).Str("body", bodyStr).Msg("Starting Persistence")
 	_, err = s.client.PutObjectWithContext(ctx, &s3.PutObjectInput{
-		Bucket:      aws.String(s.cfg.S3Bucket()),
-		Key:         aws.String(key),
-		Body:        strings.NewReader(bodyStr),
-		GrantRead:   aws.String("GrantRead"),
-		ContentType: aws.String("application/json"),
+		Bucket: aws.String(s.cfg.S3Bucket()),
+		Key:    aws.String(key),
+		Body:   strings.NewReader(bodyStr),
 	})
 	if err != nil {
 		s.cfg.Logger().Error().Err(err).Str("key", key).Msg("Failed persistence")
