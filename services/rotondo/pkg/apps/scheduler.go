@@ -40,7 +40,7 @@ func (s *Scheduler) RunDevelopment(ctx context.Context) error {
 	ctx, cancelFun := context.WithCancel(ctx)
 	defer cancelFun()
 
-	_, err := s.scheduler.Every(1).Minute().Do(s.rougecombien(ctx))
+	_, err := s.scheduler.Every(1).Minute().Do(s.rougecombienDevelopment(ctx))
 
 	if err != nil {
 		return err
@@ -52,6 +52,16 @@ func (s *Scheduler) RunDevelopment(ctx context.Context) error {
 }
 
 func (s *Scheduler) rougecombien(ctx context.Context) func() {
+	return func() {
+		app := rougecombien.NewRougecombien(s.cfg)
+		err := app.Run(ctx)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func (s *Scheduler) rougecombienDevelopment(ctx context.Context) func() {
 	return func() {
 		app := rougecombien.NewRougecombien(s.cfg)
 		err := app.RunDevelopment(ctx)
