@@ -19,7 +19,15 @@ type Rougecombien struct {
 }
 
 func NewRougecombien(cfg *config.Config) *Rougecombien {
-	store := store.NewS3(cfg)
+	store := store.NewS3(&store.S3Params{
+		AccessKey:        cfg.S3AccessKey(),
+		SecretKey:        cfg.S3SecretKey(),
+		URL:              cfg.S3URL(),
+		Bucket:           cfg.S3Bucket(),
+		Region:           cfg.S3Region(),
+		DisableSSL:       true,
+		S3ForcePathStyle: true,
+	})
 
 	return &Rougecombien{
 		cfg:      cfg,
