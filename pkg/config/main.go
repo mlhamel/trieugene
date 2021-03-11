@@ -53,6 +53,14 @@ func (c *Config) GCSURL() string {
 	return GetEnv("TRIEUGENE_GCS_URL", "trieugene.myshopify.io:4443")
 }
 
+func (c *Config) GCSAccessKey() string {
+	return GetEnv("TRIEUGENE_GCS_ACCESS_KEY", "")
+}
+
+func (c *Config) GCSAccessSecret() string {
+	return GetEnv("TRIEUGENE_GCS_ACCESS_SECRET", "")
+}
+
 func (c *Config) HTTPPort() int {
 	return c.httpPort
 }
@@ -86,7 +94,7 @@ func (c *Config) S3URL() string {
 }
 
 func (c *Config) S3Region() string {
-	return GetEnv("TRIEUGENE_S3_REGION", "us-east-1")
+	return GetEnv("TRIEUGENE_S3_REGION", "auto")
 }
 
 func (c *Config) StatsdURL() string {
