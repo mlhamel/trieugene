@@ -19,6 +19,13 @@ type Store struct {
 	value string
 }
 
+type data struct {
+	Timestamp int64       `json:"timestamp"`
+	ID        string      `json:"id"`
+	Name      string      `json:"name"`
+	Value     interface{} `json:"value"`
+}
+
 func NewStore(cfg *config.Config, store store.Store, kind string, key string, value string) runnable.Runnable {
 	return &Store{
 		cfg:   cfg,
@@ -39,12 +46,20 @@ func (s *Store) Run(ctx context.Context) error {
 		return fmt.Errorf("Error while unmarshaling value (%s): %w", s.value, err)
 	}
 
-	err = s.store.Persist(context.Background(), &store.Data{
+	timestamp := time.Now()
+	filename := fmt.Sprintf("%s/%s/%s.json", s.kind, timestamp.Format("20060102"), timestamp.Format("1504"))
+	dataStr, err := json.Marshal(data{
 		Timestamp: time.Now().Unix(),
 		Name:      s.kind,
 		ID:        s.key,
 		Value:     result,
 	})
+
+	if err != nil {
+		return fmt.Errorf("Error while marshaling data: %w", err)
+	}
+
+	err = s.store.Persist(context.Background(), filename, string(dataStr))
 	if err != nil {
 		return err
 	}

@@ -37,17 +37,17 @@ func NewRougecombien(cfg *config.Config) *Rougecombien {
 }
 
 func (r *Rougecombien) Run(ctx context.Context) error {
-	return r.manager.Perform(jobs.NewOverflowjob(r.cfg, r.manager, r.storeJob), &trieugene.Message{})
+	return r.manager.Perform(jobs.NewJsonJob(r.cfg, r.manager, r.storeJob), &trieugene.Message{})
 }
 
 func (r *Rougecombien) RunDevelopment(ctx context.Context) error {
 	run(r.setupDevelopment())
 
-	return r.manager.Perform(jobs.NewOverflowjob(r.cfg, r.manager, r.storeJob), &trieugene.Message{})
+	return r.manager.Perform(jobs.NewJsonJob(r.cfg, r.manager, r.storeJob), &trieugene.Message{})
 }
 
 func (r *Rougecombien) genericRun(ctx context.Context, result scraper.Result) error {
-	return r.manager.Perform(jobs.NewOverflowjob(r.cfg, r.manager, r.storeJob), &trieugene.Message{})
+	return r.manager.Perform(jobs.NewJsonJob(r.cfg, r.manager, r.storeJob), &trieugene.Message{})
 }
 
 func (r *Rougecombien) setupDevelopment() runnable.Runnable {

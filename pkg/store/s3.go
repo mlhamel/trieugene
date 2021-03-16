@@ -2,8 +2,6 @@ package store
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 
@@ -64,21 +62,11 @@ func (s *S3) Setup(ctx context.Context) error {
 	return nil
 }
 
-func (s *S3) Persist(ctx context.Context, data *Data) error {
-	datetime := time.Unix(data.Timestamp, 0)
-	key := fmt.Sprintf("%s/%s/%s.json", data.Name, datetime.Format("20060102"), datetime.Format("1504"))
-	body, err := json.Marshal(data)
-
-	if err != nil {
-		return err
-	}
-
-	bodyStr := string(body)
-
-	_, err = s.client.PutObjectWithContext(ctx, &s3.PutObjectInput{
+func (s *S3) Persist(ctx context.Context, filename string, data string) error {
+	_, err := s.client.PutObjectWithContext(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(s.params.Bucket),
-		Key:    aws.String(key),
-		Body:   strings.NewReader(bodyStr),
+		Key:    aws.String(filename),
+		Body:   strings.NewReader(data),
 	})
 	if err != nil {
 		return err

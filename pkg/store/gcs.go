@@ -3,7 +3,6 @@ package store
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 
 	"cloud.google.com/go/storage"
@@ -40,12 +39,11 @@ func (g *GoogleCloudStorage) Setup(ctx context.Context) error {
 	return g.bucket.Create(ctx, g.cfg.ProjectID(), nil)
 }
 
-func (g *GoogleCloudStorage) Persist(ctx context.Context, data *Data) error {
+func (g *GoogleCloudStorage) Persist(ctx context.Context, filename string, data string) error {
 	g.cfg.Logger().Debug().Msgf("Store/GoogleCloudStorage/Persist: Start")
-	fileName := buildKey(data.Name, data.Timestamp, data.ID)
-	object := g.bucket.Object(fileName)
+	object := g.bucket.Object(filename)
 	w := object.NewWriter(ctx)
-	reader := bytes.NewReader([]byte(fmt.Sprintf("%v", data)))
+	reader := bytes.NewReader([]byte(data))
 
 	if _, err := io.Copy(w, reader); err != nil {
 		return err

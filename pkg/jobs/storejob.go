@@ -2,6 +2,9 @@ package jobs
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"time"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/mlhamel/trieugene/pkg/config"
@@ -55,7 +58,18 @@ func (r *StoreJob) Perform(ctx context.Context, args ...interface{}) error {
 		}
 
 		r.cfg.Logger().Debug().Str("id", msg.ID).Int64("HappenedAt", msg.HappenedAt).Msg("Persisting data")
-		if err := r.store.Persist(ctx, msg.Data()); err != nil {
+
+		datetime := time.Unix(msg.HappenedAt, 0)
+		filename := fmt.Sprintf("%s/%s/%s.json", msg.Kind, datetime.Format("20060102"), datetime.Format("1504"))
+		body, err := json.Marshal(data)
+
+		if err != nil {
+			return err
+		}
+
+		bodyStr := string(body)
+
+		if err := r.store.Persist(ctx, filename, bodyStr); err != nil {
 			r.cfg.Logger().Error().Err(err).Msg("Error while trying to persist data")
 			return err
 		}

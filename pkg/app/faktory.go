@@ -20,7 +20,7 @@ func NewFaktory(cfg *config.Config, store store.Store) runnable.Runnable {
 	storeJob := jobs.NewStoreJob("store-rougecombien", cfg, store)
 	manager := jobs.NewFaktoryManager(cfg)
 	manager.Register(storeJob)
-	manager.Register(rougecombien.NewOverflowjob(cfg, manager, storeJob))
+	manager.Register(rougecombien.NewJsonJob(cfg, manager, storeJob))
 
 	return &Faktory{
 		cfg:     cfg,

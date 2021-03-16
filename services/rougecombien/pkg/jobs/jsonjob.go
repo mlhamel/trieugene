@@ -8,25 +8,25 @@ import (
 	"github.com/mlhamel/trieugene/services/rougecombien/pkg/scraper"
 )
 
-type OverflowJob struct {
+type JsonJob struct {
 	cfg      *config.Config
 	manager  trieugene.Manager
 	storejob trieugene.Job
 }
 
-func NewOverflowjob(cfg *config.Config, manager trieugene.Manager, storejob trieugene.Job) trieugene.Job {
-	return &OverflowJob{
+func NewJsonJob(cfg *config.Config, manager trieugene.Manager, storejob trieugene.Job) trieugene.Job {
+	return &JsonJob{
 		cfg:      cfg,
 		manager:  manager,
 		storejob: storejob,
 	}
 }
 
-func (o *OverflowJob) Kind() string {
-	return "overflow-rougecombien"
+func (o *JsonJob) Kind() string {
+	return "json-rougecombien"
 }
 
-func (o *OverflowJob) Perform(ctx context.Context, args ...interface{}) error {
+func (o *JsonJob) Perform(ctx context.Context, args ...interface{}) error {
 	return scraper.NewScraper(o.cfg, func(ctx context.Context, result scraper.Result) error {
 		return o.manager.Perform(o.storejob, &trieugene.Message{
 			ID:          result.Sha1(),
@@ -38,7 +38,7 @@ func (o *OverflowJob) Perform(ctx context.Context, args ...interface{}) error {
 	}).Run(ctx)
 }
 
-func (o *OverflowJob) Run(ctx context.Context, args ...interface{}) error {
+func (o *JsonJob) Run(ctx context.Context, args ...interface{}) error {
 	if err := o.Perform(ctx, args); err != nil {
 		return err
 	}
