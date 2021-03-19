@@ -56,15 +56,7 @@ func (t *trieugene) Run(ctx context.Context) error {
 }
 
 func (t *trieugeneDev) Run(ctx context.Context) error {
-	store := store.NewS3(&store.S3Params{
-		AccessKey:        t.cfg.S3AccessKey(),
-		SecretKey:        t.cfg.S3SecretKey(),
-		URL:              t.cfg.S3URL(),
-		Bucket:           t.cfg.S3Bucket(),
-		Region:           t.cfg.S3Region(),
-		DisableSSL:       true,
-		S3ForcePathStyle: true,
-	})
+	store := store.NewLocal(t.cfg.LocalPrefix())
 
 	run(setupDevelopment(t.cfg))
 

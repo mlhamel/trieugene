@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"time"
@@ -63,6 +64,10 @@ func (c *Config) GCSAccessSecret() string {
 
 func (c *Config) HTTPPort() int {
 	return c.httpPort
+}
+
+func (c *Config) LocalPrefix() string {
+	return fmt.Sprintf("%s/.cfg/trieugene", GetEnv("HOME", "/tmp"))
 }
 
 func (c *Config) Logger() *zerolog.Logger {
