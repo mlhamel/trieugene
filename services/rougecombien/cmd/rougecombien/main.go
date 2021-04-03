@@ -11,11 +11,11 @@ import (
 
 func main() {
 	cfg := config.NewConfig()
-	rougecombien := apps.NewRougecombien(cfg)
 
 	cliApp := cli.App{
 		Name: "rougecombien",
 		Action: func(*cli.Context) error {
+			rougecombien := apps.NewRougecombien(cfg)
 			return rougecombien.Run(context.Background())
 		},
 	}
@@ -24,7 +24,15 @@ func main() {
 		{
 			Name: "dev",
 			Action: func(c *cli.Context) error {
+				rougecombien := apps.NewRougecombienDev(cfg)
 				return rougecombien.RunDevelopment(context.Background())
+			},
+		},
+		{
+			Name: "inline",
+			Action: func(c *cli.Context) error {
+				rougecombien := apps.NewRougecombienDev(cfg)
+				return rougecombien.RunInline(context.Background())
 			},
 		},
 	}

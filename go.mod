@@ -10,6 +10,7 @@ require (
 	github.com/contribsys/faktory v1.3.0-1
 	github.com/contribsys/faktory_worker_go v1.4.2
 	github.com/go-co-op/gocron v0.6.0
+	github.com/gocarina/gocsv v0.0.0-20210326111627-0340a0229e98
 	github.com/gorilla/mux v1.8.0
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/pior/runnable v0.8.0

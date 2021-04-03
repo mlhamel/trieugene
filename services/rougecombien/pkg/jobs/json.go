@@ -27,7 +27,10 @@ func (o *JsonJob) Kind() string {
 }
 
 func (o *JsonJob) Perform(ctx context.Context, args ...interface{}) error {
-	return scraper.NewScraper(o.cfg, func(ctx context.Context, result scraper.Result) error {
+	httpScraper := scraper.NewHttpScraper(o.cfg)
+	parser := scraper.NewParser(o.cfg, httpScraper)
+
+	return parser.Run(ctx, func(ctx context.Context, result scraper.Result) error {
 		return o.manager.Perform(o.storejob, &trieugene.Message{
 			ID:          result.Sha1(),
 			Kind:        o.storejob.Kind(),
@@ -35,7 +38,7 @@ func (o *JsonJob) Perform(ctx context.Context, args ...interface{}) error {
 			HappenedAt:  result.TakenAt.Unix(),
 			Value:       result.Outflow,
 		})
-	}).Run(ctx)
+	})
 }
 
 func (o *JsonJob) Run(ctx context.Context, args ...interface{}) error {

@@ -17,10 +17,15 @@ type Faktory struct {
 }
 
 func NewFaktory(cfg *config.Config, store store.Store) runnable.Runnable {
-	storeJob := jobs.NewStoreJob("store-rougecombien", cfg, store)
+	jsonStoreJob := jobs.NewJsonStoreJob("json-store-rougecombien", cfg, store)
+	csvStoreJob := jobs.NewCsvStoreJob("csv-store-rougecombien", cfg, store)
+
 	manager := jobs.NewFaktoryManager(cfg)
-	manager.Register(storeJob)
-	manager.Register(rougecombien.NewJsonJob(cfg, manager, storeJob))
+
+	manager.Register(jsonStoreJob)
+	manager.Register(csvStoreJob)
+	manager.Register(rougecombien.NewJsonJob(cfg, manager, jsonStoreJob))
+	manager.Register(rougecombien.NewCsvJob(cfg, manager, csvStoreJob))
 
 	return &Faktory{
 		cfg:     cfg,

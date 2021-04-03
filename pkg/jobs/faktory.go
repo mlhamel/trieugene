@@ -26,10 +26,10 @@ func (f *FaktoryManager) Register(job Job) error {
 	return nil
 }
 
-func (f *FaktoryManager) Perform(job Job, msg *Message) error {
-	f.cfg.Logger().Debug().Msgf("Instanciating job %s with args %v", job.Kind(), msg)
+func (f *FaktoryManager) Perform(job Job, msgs ...*Message) error {
+	f.cfg.Logger().Debug().Msgf("Instanciating job %s", job.Kind())
 
-	instance := faktory.NewJob(job.Kind(), msg)
+	instance := faktory.NewJob(job.Kind(), msgs)
 	client, err := f.faktoryClientInstance()
 	if err != nil {
 		return err

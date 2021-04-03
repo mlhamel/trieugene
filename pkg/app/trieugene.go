@@ -56,7 +56,7 @@ func (t *trieugene) Run(ctx context.Context) error {
 }
 
 func (t *trieugeneDev) Run(ctx context.Context) error {
-	store := store.NewLocal(t.cfg.LocalPrefix())
+	store := store.NewLocal(t.cfg)
 
 	run(setupDevelopment(t.cfg))
 

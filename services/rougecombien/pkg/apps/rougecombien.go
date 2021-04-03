@@ -13,9 +13,10 @@ import (
 )
 
 type Rougecombien struct {
-	cfg      *config.Config
-	storeJob trieugene.Job
-	manager  trieugene.Manager
+	cfg          *config.Config
+	jsonStoreJob trieugene.Job
+	csvStoreJob  trieugene.Job
+	manager      trieugene.Manager
 }
 
 func NewRougecombien(cfg *config.Config) *Rougecombien {
@@ -30,24 +31,44 @@ func NewRougecombien(cfg *config.Config) *Rougecombien {
 	})
 
 	return &Rougecombien{
-		cfg:      cfg,
-		storeJob: trieugene.NewStoreJob("store-rougecombien", cfg, store),
-		manager:  trieugene.NewFaktoryManager(cfg),
+		cfg:          cfg,
+		jsonStoreJob: trieugene.NewJsonStoreJob("json-store-rougecombien", cfg, store),
+		csvStoreJob:  trieugene.NewCsvStoreJob("csv-store-rougecombien", cfg, store),
+		manager:      trieugene.NewFaktoryManager(cfg),
+	}
+}
+
+func NewRougecombienDev(cfg *config.Config) *Rougecombien {
+	store := store.NewLocal(cfg)
+
+	return &Rougecombien{
+		cfg:          cfg,
+		jsonStoreJob: trieugene.NewJsonStoreJob("json-store-rougecombien", cfg, store),
+		csvStoreJob:  trieugene.NewCsvStoreJob("csv-store-rougecombien", cfg, store),
+		manager:      trieugene.NewFaktoryManager(cfg),
 	}
 }
 
 func (r *Rougecombien) Run(ctx context.Context) error {
-	return r.manager.Perform(jobs.NewJsonJob(r.cfg, r.manager, r.storeJob), &trieugene.Message{})
+	return r.manager.Perform(jobs.NewJsonJob(r.cfg, r.manager, r.jsonStoreJob), &trieugene.Message{})
 }
 
 func (r *Rougecombien) RunDevelopment(ctx context.Context) error {
 	run(r.setupDevelopment())
 
-	return r.manager.Perform(jobs.NewJsonJob(r.cfg, r.manager, r.storeJob), &trieugene.Message{})
+	return r.manager.Perform(jobs.NewCsvJob(r.cfg, r.manager, r.csvStoreJob), &trieugene.Message{})
+}
+
+func (r *Rougecombien) RunInline(ctx context.Context) error {
+	run(r.setupDevelopment())
+
+	job := jobs.NewCsvJob(r.cfg, r.manager, r.csvStoreJob)
+
+	return job.Run(ctx, &trieugene.Message{})
 }
 
 func (r *Rougecombien) genericRun(ctx context.Context, result scraper.Result) error {
-	return r.manager.Perform(jobs.NewJsonJob(r.cfg, r.manager, r.storeJob), &trieugene.Message{})
+	return r.manager.Perform(jobs.NewJsonJob(r.cfg, r.manager, r.jsonStoreJob), &trieugene.Message{})
 }
 
 func (r *Rougecombien) setupDevelopment() runnable.Runnable {
