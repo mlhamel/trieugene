@@ -56,13 +56,33 @@ func (r *Rougecombien) Run(ctx context.Context) error {
 func (r *Rougecombien) RunDevelopment(ctx context.Context) error {
 	run(r.setupDevelopment())
 
-	return r.manager.Perform(jobs.NewCsvJob(r.cfg, r.manager, r.csvStoreJob), &trieugene.Message{})
+	httpScraper := scraper.NewHttpScraper(r.cfg)
+	parser := scraper.NewParser(r.cfg, httpScraper)
+
+	job := jobs.NewCsvJob(&jobs.CsvJobKwargs{
+		Cfg:      r.cfg,
+		Manager:  r.manager,
+		StoreJob: r.csvStoreJob,
+		Scraper:  httpScraper,
+		Parser:   parser,
+	})
+
+	return r.manager.Perform(job, &trieugene.Message{})
 }
 
 func (r *Rougecombien) RunInline(ctx context.Context) error {
 	run(r.setupDevelopment())
 
-	job := jobs.NewCsvJob(r.cfg, r.manager, r.csvStoreJob)
+	httpScraper := scraper.NewHttpScraper(r.cfg)
+	parser := scraper.NewParser(r.cfg, httpScraper)
+
+	job := jobs.NewCsvJob(&jobs.CsvJobKwargs{
+		Cfg:      r.cfg,
+		Manager:  r.manager,
+		StoreJob: r.csvStoreJob,
+		Scraper:  httpScraper,
+		Parser:   parser,
+	})
 
 	return job.Run(ctx, &trieugene.Message{})
 }

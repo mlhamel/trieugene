@@ -8,18 +8,20 @@ import (
 	"github.com/mlhamel/trieugene/services/rougecombien/pkg/scraper"
 )
 
-type CsvJob struct {
-	cfg      *config.Config
-	manager  trieugene.Manager
-	storejob trieugene.Job
+type CsvJobKwargs struct {
+	Cfg      *config.Config
+	Manager  trieugene.Manager
+	StoreJob trieugene.Job
+	Parser   scraper.Parser
+	Scraper  scraper.Scraper
 }
 
-func NewCsvJob(cfg *config.Config, manager trieugene.Manager, storejob trieugene.Job) trieugene.Job {
-	return &CsvJob{
-		cfg:      cfg,
-		manager:  manager,
-		storejob: storejob,
-	}
+type CsvJob struct {
+	kwargs *CsvJobKwargs
+}
+
+func NewCsvJob(kwargs *CsvJobKwargs) trieugene.Job {
+	return &CsvJob{kwargs: kwargs}
 }
 
 func (o *CsvJob) Kind() string {
@@ -29,10 +31,7 @@ func (o *CsvJob) Kind() string {
 func (o *CsvJob) Perform(ctx context.Context, args ...interface{}) error {
 	var results = make(map[int][]scraper.Result)
 
-	httpScraper := scraper.NewHttpScraper(o.cfg)
-	parser := scraper.NewParser(o.cfg, httpScraper)
-
-	err := parser.Run(ctx, func(ctx context.Context, result scraper.Result) error {
+	err := o.kwargs.Parser.Run(ctx, func(ctx context.Context, result scraper.Result) error {
 		if len(results[result.TakenAt.Day()]) <= 0 {
 			results[result.TakenAt.Day()] = []scraper.Result{}
 		}
@@ -49,13 +48,13 @@ func (o *CsvJob) Perform(ctx context.Context, args ...interface{}) error {
 		for _, result := range values {
 			messages = append(messages, trieugene.Message{
 				ID:          result.Sha1(),
-				Kind:        o.storejob.Kind(),
+				Kind:        o.kwargs.StoreJob.Kind(),
 				ProcessedAt: result.ScrapedAt.Unix(),
 				HappenedAt:  result.TakenAt.Unix(),
 				Value:       result.Outflow,
 			})
 		}
-		o.storejob.Run(ctx, messages...)
+		o.kwargs.StoreJob.Run(ctx, messages...)
 	}
 
 	return nil
