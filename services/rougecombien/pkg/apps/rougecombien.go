@@ -96,10 +96,6 @@ func (r *Rougecombien) RunInline(ctx context.Context) error {
 	return job.Run(ctx, &trieugene.Message{})
 }
 
-func (r *Rougecombien) genericRun(ctx context.Context, result scraper.Result) error {
-	return r.manager.Perform(jobs.NewJsonJob(r.cfg, r.manager, r.jsonStoreJob), &trieugene.Message{})
-}
-
 func (r *Rougecombien) setupDevelopment() runnable.Runnable {
 	return runnable.Func(func(ctx context.Context) error {
 		err := os.Setenv("FAKTORY_URL", r.cfg.FaktoryURL())
