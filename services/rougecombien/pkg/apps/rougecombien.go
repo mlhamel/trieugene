@@ -50,7 +50,16 @@ func NewRougecombienDev(cfg *config.Config) *Rougecombien {
 }
 
 func (r *Rougecombien) Run(ctx context.Context) error {
-	return r.manager.Perform(jobs.NewJsonJob(r.cfg, r.manager, r.jsonStoreJob), &trieugene.Message{})
+	httpScraper := scraper.NewHttpScraper(r.cfg)
+	parser := scraper.NewParser(r.cfg, httpScraper)
+
+	return r.manager.Perform(jobs.NewCsvJob(&jobs.CsvJobKwargs{
+		Cfg:      r.cfg,
+		Manager:  r.manager,
+		StoreJob: r.csvStoreJob,
+		Parser:   parser,
+		Scraper:  httpScraper,
+	}))
 }
 
 func (r *Rougecombien) RunDevelopment(ctx context.Context) error {
