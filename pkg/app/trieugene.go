@@ -42,7 +42,7 @@ func NewTrieugeneStore(cfg *config.Config, kind string, key string, value string
 }
 
 func (t *trieugene) Run(ctx context.Context) error {
-	store := store.NewS3(&store.S3Params{
+	store := store.NewS3(t.cfg, &store.S3Params{
 		AccessKey: t.cfg.GCSAccessKey(),
 		SecretKey: t.cfg.GCSAccessSecret(),
 		URL:       t.cfg.GCSURL(),
@@ -68,7 +68,7 @@ func (t *trieugeneDev) Run(ctx context.Context) error {
 }
 
 func (t *trieugeneStore) Run(ctx context.Context) error {
-	store := store.NewS3(&store.S3Params{
+	store := store.NewS3(t.cfg, &store.S3Params{
 		AccessKey:        t.cfg.S3AccessKey(),
 		SecretKey:        t.cfg.S3SecretKey(),
 		URL:              t.cfg.S3URL(),
