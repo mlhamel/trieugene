@@ -8,6 +8,8 @@ Data aggregation pipeline properly scrape and collect interesting dataset
 
 **Internal Dashboard**: [Faktory](https://trieugene-njod9.ondigitalocean.app/)
 
+**Includes Services**: [Faktory](services/faktory/) •  [Rougecombien](services/rougecombien/) • [Rotondo](services/rotondo/)
+
 ## Installation
 
 For local development you simply have to follow those steps:
