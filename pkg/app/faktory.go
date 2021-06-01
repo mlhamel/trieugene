@@ -6,8 +6,8 @@ import (
 	"github.com/mlhamel/trieugene/pkg/config"
 	"github.com/mlhamel/trieugene/pkg/jobs"
 	"github.com/mlhamel/trieugene/pkg/store"
-	rougecombien "github.com/mlhamel/trieugene/services/rougecombien/pkg/jobs"
-	"github.com/mlhamel/trieugene/services/rougecombien/pkg/scraper"
+	rougecombienJobs "github.com/mlhamel/trieugene/services/rougecombien/pkg/jobs"
+	rougecombienScraper "github.com/mlhamel/trieugene/services/rougecombien/pkg/scraper"
 	"github.com/pior/runnable"
 )
 
@@ -23,10 +23,10 @@ func NewFaktory(cfg *config.Config, store store.Store) runnable.Runnable {
 
 	manager := jobs.NewFaktoryManager(cfg)
 
-	httpScraper := scraper.NewHttpScraper(cfg)
-	parser := scraper.NewParser(cfg, httpScraper)
+	httpScraper := rougecombienScraper.NewHttpScraper(cfg)
+	parser := rougecombienScraper.NewParser(cfg, httpScraper)
 
-	csvJob := rougecombien.NewCsvJob(&rougecombien.CsvJobKwargs{
+	csvJob := rougecombienJobs.NewCsvJob(&rougecombienJobs.CsvJobKwargs{
 		Cfg:      cfg,
 		Manager:  manager,
 		StoreJob: csvStoreJob,
@@ -36,7 +36,7 @@ func NewFaktory(cfg *config.Config, store store.Store) runnable.Runnable {
 
 	manager.Register(jsonStoreJob)
 	manager.Register(csvStoreJob)
-	manager.Register(rougecombien.NewJsonJob(cfg, manager, jsonStoreJob))
+	manager.Register(rougecombienJobs.NewJsonJob(cfg, manager, jsonStoreJob))
 	manager.Register(csvJob)
 
 	return &Faktory{

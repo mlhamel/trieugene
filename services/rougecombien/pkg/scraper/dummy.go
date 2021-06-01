@@ -4,13 +4,14 @@ import (
 	"context"
 
 	"github.com/mlhamel/trieugene/pkg/config"
+	"github.com/mlhamel/trieugene/pkg/scraper"
 )
 
 type DummyScraper struct {
 	cfg *config.Config
 }
 
-func NewDummyScraper(cfg *config.Config) Scraper {
+func NewDummyScraper(cfg *config.Config) scraper.Scraper {
 	return &HttpScraper{
 		cfg: cfg,
 	}

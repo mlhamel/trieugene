@@ -8,28 +8,29 @@ import (
 	"time"
 
 	"github.com/mlhamel/trieugene/pkg/config"
+	"github.com/mlhamel/trieugene/pkg/scraper"
 )
 
 type parserImpl struct {
 	cfg     *config.Config
-	scraper Scraper
+	scraper scraper.Scraper
 }
 
-func NewParser(cfg *config.Config, scraper Scraper) Parser {
+func NewParser(cfg *config.Config, scraper scraper.Scraper) scraper.Parser {
 	return &parserImpl{
 		cfg:     cfg,
 		scraper: scraper,
 	}
 }
 
-func (p *parserImpl) Run(ctx context.Context, consumer Consumer) error {
+func (p *parserImpl) Run(ctx context.Context, consumer scraper.Consumer) error {
 	data, err := p.scraper.Run(ctx)
 
 	if err != nil {
 		return err
 	}
 
-	var record Result
+	var record scraper.Result
 
 	if err != nil {
 		return fmt.Errorf("Error while parsing: %w", err)
@@ -71,7 +72,7 @@ func (p *parserImpl) Run(ctx context.Context, consumer Consumer) error {
 			Info().
 			Time("ScrapedAt", record.ScrapedAt).
 			Time("TakenAt", record.TakenAt).
-			Float64("Outflow", record.Outflow).
+			Interface("Outflow", record.Outflow).
 			Msg("Record parsed")
 
 		if err = consumer(ctx, record); err != nil {
