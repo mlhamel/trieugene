@@ -23,12 +23,12 @@ type Consumer func(context.Context, Result) error
 type Result struct {
 	ScrapedAt time.Time
 	TakenAt   time.Time
-	Outflow   float64
+	Outflow   interface{}
 }
 
 func (r *Result) Sha1() string {
 	hasher := sha1.New()
-	_, err := hasher.Write([]byte(fmt.Sprintf("%d:%f", r.TakenAt, r.Outflow)))
+	_, err := hasher.Write([]byte(fmt.Sprintf("%d:%f", r.TakenAt.Unix(), r.Outflow)))
 	if err != nil {
 		return ""
 	}
@@ -38,7 +38,7 @@ func (r *Result) Sha1() string {
 
 func (r *Result) MD5() string {
 	hasher := md5.New()
-	_, err := io.WriteString(hasher, fmt.Sprintf("%d:%f", r.TakenAt, r.Outflow))
+	_, err := io.WriteString(hasher, fmt.Sprintf("%d:%f", r.TakenAt.Unix(), r.Outflow))
 	if err != nil {
 		return ""
 	}

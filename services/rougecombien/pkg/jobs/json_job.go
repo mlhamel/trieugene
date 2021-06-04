@@ -5,6 +5,7 @@ import (
 
 	"github.com/mlhamel/trieugene/pkg/config"
 	trieugene "github.com/mlhamel/trieugene/pkg/jobs"
+	base "github.com/mlhamel/trieugene/pkg/scraper"
 	"github.com/mlhamel/trieugene/services/rougecombien/pkg/scraper"
 )
 
@@ -30,7 +31,7 @@ func (o *JsonJob) Perform(ctx context.Context, args ...interface{}) error {
 	httpScraper := scraper.NewHttpScraper(o.cfg)
 	parser := scraper.NewParser(o.cfg, httpScraper)
 
-	return parser.Run(ctx, func(ctx context.Context, result scraper.Result) error {
+	return parser.Run(ctx, func(ctx context.Context, result base.Result) error {
 		return o.manager.Perform(o.storejob, &trieugene.Message{
 			ID:          result.Sha1(),
 			Kind:        o.storejob.Kind(),

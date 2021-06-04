@@ -5,15 +5,15 @@ import (
 
 	"github.com/mlhamel/trieugene/pkg/config"
 	trieugene "github.com/mlhamel/trieugene/pkg/jobs"
-	"github.com/mlhamel/trieugene/services/rougecombien/pkg/scraper"
+	base "github.com/mlhamel/trieugene/pkg/scraper"
 )
 
 type CsvJobKwargs struct {
 	Cfg      *config.Config
 	Manager  trieugene.Manager
 	StoreJob trieugene.Job
-	Parser   scraper.Parser
-	Scraper  scraper.Scraper
+	Parser   base.Parser
+	Scraper  base.Scraper
 }
 
 type CsvJob struct {
@@ -29,11 +29,11 @@ func (o *CsvJob) Kind() string {
 }
 
 func (o *CsvJob) Perform(ctx context.Context, args ...interface{}) error {
-	var results = make(map[int][]scraper.Result)
+	var results = make(map[int][]base.Result)
 
-	err := o.kwargs.Parser.Run(ctx, func(ctx context.Context, result scraper.Result) error {
+	err := o.kwargs.Parser.Run(ctx, func(ctx context.Context, result base.Result) error {
 		if len(results[result.TakenAt.Day()]) <= 0 {
-			results[result.TakenAt.Day()] = []scraper.Result{}
+			results[result.TakenAt.Day()] = []base.Result{}
 		}
 		results[result.TakenAt.Day()] = append(results[result.TakenAt.Day()], result)
 		return nil
