@@ -20,7 +20,7 @@ func NewWeb(cfg *config.Config) runnable.Runnable {
 
 	web := Web{cfg, router}
 
-	router.HandleFunc("/ping", web.ping).Methods(http.MethodGet)
+	router.HandleFunc("/ping", web.Ping).Methods(http.MethodGet)
 
 	return &web
 }
@@ -28,10 +28,19 @@ func NewWeb(cfg *config.Config) runnable.Runnable {
 func (web *Web) Run(ctx context.Context) error {
 	hostname := fmt.Sprintf(":%d", web.cfg.HTTPPort())
 	web.cfg.Logger().Info().Int("port", web.cfg.HTTPPort()).Msg("Listening and Serving")
-	return http.ListenAndServe(hostname, web.router)
+	server := http.Server{Addr: hostname, Handler: web.router}
+	go func() {
+		if err := server.ListenAndServe(); err != nil {
+			web.cfg.Logger().Err(err)
+		}
+	}()
+	if err := server.Shutdown(ctx); err != nil {
+		return err
+	}
+	return nil
 }
 
-func (web *Web) ping(w http.ResponseWriter, req *http.Request) {
+func (web *Web) Ping(w http.ResponseWriter, req *http.Request) {
 	web.cfg.Logger().Info().Str("uri", req.RequestURI).Str("remote", req.RemoteAddr).Msg("Request received")
 	fmt.Fprintf(w, "pong")
 }

@@ -5,7 +5,6 @@ go 1.13
 require (
 	cloud.google.com/go v0.71.0 // indirect
 	cloud.google.com/go/storage v1.12.0
-	github.com/DataDog/datadog-go v4.2.0+incompatible
 	github.com/aws/aws-sdk-go v1.36.28
 	github.com/contribsys/faktory v1.3.0-1
 	github.com/contribsys/faktory_worker_go v1.4.2
