@@ -1,0 +1,11 @@
+[package]
+name = "trieugene"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+faktory = "0.11.1"
+
+[[bin]]
+name = "trieugene-rust"
+path = "src/main.rs"

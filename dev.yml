@@ -6,6 +6,7 @@ up:
       version: 1.13
       modules: true
   - railgun
+  - rust: beta
 commands:
   build: make build
   rougecombien: go run services/rougecombien/cmd/rougecombien/main.go dev
