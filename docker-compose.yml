@@ -1,0 +1,40 @@
+services:
+  faktory:
+    container_name: faktory
+    image: contribsys/faktory
+    ports:
+      - "7419:7419"
+      - "7420:7420"
+  trieugene:
+    container_name: trieugene
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      TRIEUGENE_FAKTORY_URL: "tcp://faktory:7419"
+      FAKTORY_URL: "tcp://faktory:7419"
+      FAKTORY_PROVIDER: "tcp://faktory:7419"
+    links:
+      - faktory
+  rougecombien:
+    container_name: rougecombien
+    build:
+      context: .
+      dockerfile: services/rougecombien/Dockerfile
+    environment:
+      TRIEUGENE_FAKTORY_URL: "tcp://faktory:7419"
+      FAKTORY_URL: "tcp://faktory:7419"
+      FAKTORY_PROVIDER: "tcp://faktory:7419"
+    links:
+      - faktory
+  rotondo:
+    container_name: rotondo
+    build:
+      context: .
+      dockerfile: services/rotondo/Dockerfile
+    environment:
+      TRIEUGENE_FAKTORY_URL: "tcp://faktory:7419"
+      FAKTORY_URL: "tcp://faktory:7419"
+      FAKTORY_PROVIDER: "tcp://faktory:7419"
+    links:
+      - faktory

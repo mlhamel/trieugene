@@ -47,7 +47,7 @@ func (c *Config) Environment() environmentType {
 }
 
 func (c *Config) FaktoryURL() string {
-	return GetEnv("TRIEUGENE_FAKTORY_URL", "tcp://trieugene.myshopify.io:7419")
+	return GetEnv("TRIEUGENE_FAKTORY_URL", "tcp://faktory:7419")
 }
 
 func (c *Config) GCSURL() string {
