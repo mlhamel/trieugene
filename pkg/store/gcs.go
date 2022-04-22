@@ -10,24 +10,20 @@ import (
 )
 
 type GoogleCloudStorage struct {
-	cfg    *config.Config
-	client *storage.Client
-	bucket *storage.BucketHandle
+	cfg        *config.Config
+	client     *storage.Client
+	bucket     *storage.BucketHandle
+	bucketName string
 }
 
 func NewGoogleCloudStorage(ctx context.Context, cfg *config.Config) (Store, error) {
 	cfg.Logger().Debug().Msgf("NewGoogleCloudStorage: Initiating")
-	client, err := storage.NewClient(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	bucket := client.Bucket(cfg.BucketName())
 
 	instance := GoogleCloudStorage{
-		cfg:    cfg,
-		client: client,
-		bucket: bucket,
+		bucketName: cfg.BucketName(),
+		cfg:        cfg,
+		client:     nil,
+		bucket:     nil,
 	}
 
 	cfg.Logger().Debug().Msgf("NewGoogleCloudStorage: Succeed")
@@ -35,12 +31,43 @@ func NewGoogleCloudStorage(ctx context.Context, cfg *config.Config) (Store, erro
 	return &instance, nil
 }
 
+func (g *GoogleCloudStorage) Initialized() bool {
+	return g.client != nil && g.bucket != nil
+}
+
+func (g *GoogleCloudStorage) Init(ctx context.Context) error {
+	g.cfg.Logger().Debug().Msgf("Store/GoogleCloudStorage/Init: Start")
+
+	if g.Initialized() {
+		return nil
+	}
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		return err
+	}
+
+	g.client = client
+	g.bucket = g.client.Bucket(g.bucketName)
+
+	g.cfg.Logger().Debug().Msgf("GoogleCloudStorage/Init: Success")
+
+	return nil
+}
+
 func (g *GoogleCloudStorage) Setup(ctx context.Context) error {
-	return g.bucket.Create(ctx, g.cfg.ProjectID(), nil)
+	g.cfg.Logger().Debug().Msgf("Store/GoogleCloudStorage/Setup: Start")
+	err := g.bucket.Create(ctx, g.cfg.ProjectID(), nil)
+	if err != nil {
+		return err
+	}
+	g.cfg.Logger().Debug().Msgf("Store/GoogleCloudStorage/Setup: Start")
+	return nil
 }
 
 func (g *GoogleCloudStorage) Persist(ctx context.Context, filename string, data string) error {
 	g.cfg.Logger().Debug().Msgf("Store/GoogleCloudStorage/Persist: Start")
+	g.Init(ctx)
+
 	object := g.bucket.Object(filename)
 	w := object.NewWriter(ctx)
 	reader := bytes.NewReader([]byte(data))

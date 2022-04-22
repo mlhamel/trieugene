@@ -17,9 +17,11 @@ func TestNewGoogleCloudStorage(t *testing.T) {
 
 func TestGoogleCloudStorageSetup(t *testing.T) {
 	ctx := context.Background()
-	store, _ := NewGoogleCloudStorage(ctx, config.NewConfig())
 
-	err := store.Setup(ctx)
+	store, err := NewGoogleCloudStorage(ctx, config.NewConfig())
+	require.NoError(t, err)
+
+	err = store.Setup(ctx)
 
 	require.NoError(t, err)
 }
