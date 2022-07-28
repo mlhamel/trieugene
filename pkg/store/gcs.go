@@ -56,7 +56,12 @@ func (g *GoogleCloudStorage) Init(ctx context.Context) error {
 
 func (g *GoogleCloudStorage) Setup(ctx context.Context) error {
 	g.cfg.Logger().Debug().Msgf("Store/GoogleCloudStorage/Setup: Start")
-	err := g.bucket.Create(ctx, g.cfg.ProjectID(), nil)
+	err := g.Init(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = g.bucket.Create(ctx, g.cfg.ProjectID(), nil)
 	if err != nil {
 		return err
 	}
@@ -66,7 +71,10 @@ func (g *GoogleCloudStorage) Setup(ctx context.Context) error {
 
 func (g *GoogleCloudStorage) Persist(ctx context.Context, filename string, data string) error {
 	g.cfg.Logger().Debug().Msgf("Store/GoogleCloudStorage/Persist: Start")
-	g.Init(ctx)
+	err := g.Init(ctx)
+	if err != nil {
+		return err
+	}
 
 	object := g.bucket.Object(filename)
 	w := object.NewWriter(ctx)

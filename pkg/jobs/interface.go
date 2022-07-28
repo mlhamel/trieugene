@@ -18,11 +18,11 @@ type Manager interface {
 }
 
 type Message struct {
-	ProcessedAt int64       `json:"processed_at" mapstructure:"processed_at" csv:"processed_at"`
-	HappenedAt  int64       `json:"happened_at" mapstructure:"happened_at" csv:"happened_at"`
-	ID          string      `json:"id" csv:"id"`
-	Kind        string      `json:"kind" csv:"kind"`
-	Value       interface{} `json:"value" csv:"value"`
+	ProcessedAt int64       `parquet:"name=processed_at, type=INT64" json:"processed_at" mapstructure:"processed_at" csv:"processed_at"`
+	HappenedAt  int64       `parquet:"name=happened_at, type=INT64" json:"happened_at" mapstructure:"happened_at" csv:"happened_at"`
+	ID          string      `parquet:"name=id, type=BYTE_ARRAY, convertedtype=UTF8, encoding=PLAIN" json:"id" csv:"id"`
+	Kind        string      `parquet:"name=kind, type=BYTE_ARRAY, convertedtype=UTF8, encoding=PLAIN" json:"kind" csv:"kind"`
+	Value       interface{} `parquet:"name=value, type=BYTE_ARRAY, convertedtype=UTF8, encoding=PLAIN_DICTIONARY" json:"value" csv:"value"`
 }
 
 func NewMessageFromArg(arg interface{}) (*Message, error) {

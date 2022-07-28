@@ -20,24 +20,26 @@ type Faktory struct {
 func NewFaktory(cfg *config.Config, store store.Store) runnable.Runnable {
 	jsonStoreJob := jobs.NewJsonStoreJob("json-store-rougecombien", cfg, store)
 	csvStoreJob := jobs.NewCsvStoreJob("csv-store-rougecombien", cfg, store)
+	parquetStoreJob := jobs.NewParquetStoreJob("parquet-store-rougecombien", cfg, store)
 
 	manager := jobs.NewFaktoryManager(cfg)
 
 	httpScraper := rougecombienScraper.NewHttpScraper(cfg)
 	parser := rougecombienScraper.NewParser(cfg, httpScraper)
 
-	csvJob := rougecombienJobs.NewCsvJob(&rougecombienJobs.CsvJobKwargs{
+	parquetJob := rougecombienJobs.NewParquetJob(&rougecombienJobs.ParquetJobKwargs{
 		Cfg:      cfg,
 		Manager:  manager,
-		StoreJob: csvStoreJob,
+		StoreJob: parquetStoreJob,
 		Scraper:  httpScraper,
 		Parser:   parser,
 	})
 
 	manager.Register(jsonStoreJob)
 	manager.Register(csvStoreJob)
+	manager.Register(parquetStoreJob)
 	manager.Register(rougecombienJobs.NewJsonJob(cfg, manager, jsonStoreJob))
-	manager.Register(csvJob)
+	manager.Register(parquetJob)
 
 	return &Faktory{
 		cfg:     cfg,

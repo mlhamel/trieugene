@@ -22,6 +22,5 @@ func TestGoogleCloudStorageSetup(t *testing.T) {
 	require.NoError(t, err)
 
 	err = store.Setup(ctx)
-
 	require.NoError(t, err)
 }
