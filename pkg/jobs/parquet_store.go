@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/xitongsys/parquet-go/writer"
@@ -77,9 +76,7 @@ func (c *ParquetStoreJob) Perform(ctx context.Context, args ...interface{}) erro
 		return nil
 	}
 
-	datetime := time.Unix(first.HappenedAt, 0)
-	filename := fmt.Sprintf("%s/%s.parquet", first.Kind, datetime.Format("20060102"))
-
+	filename := fmt.Sprintf("%s/%d.parquet", first.Kind, first.HappenedAt)
 	bytes := bf.Bytes()
 	body := string(bytes)
 

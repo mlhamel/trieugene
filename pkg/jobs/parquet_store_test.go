@@ -2,6 +2,7 @@ package jobs
 
 import (
 	"context"
+	"path"
 	"testing"
 
 	"github.com/mlhamel/trieugene/pkg/config"
@@ -40,15 +41,27 @@ func TestParquetStoreWithtData(t *testing.T) {
 
 	require.Equal(t, "stuff", job.Kind())
 
-	line := interface{}(map[string]string{
-		"ProcessedAt": "20221223",
-		"HappennedAt": "20221223",
+	line1 := interface{}(map[string]interface{}{
+		"ProcessedAt": 20221223,
+		"HappenedAt":  20221223,
 		"ID":          "1",
 		"Kind":        "stuff",
 		"Value":       "1",
 	})
 
-	err = job.Run(ctx, line)
+	line2 := interface{}(map[string]interface{}{
+		"ProcessedAt": 20221222,
+		"HappennedAt": 20221222,
+		"ID":          "2",
+		"Kind":        "poutine",
+		"Value":       "2",
+	})
+
+	err = job.Run(ctx, line1, line2)
 
 	require.NoError(t, err)
+
+	filename := path.Join(cfg.LocalPrefix(), "stuff", "20221223.parquet")
+
+	require.FileExists(t, filename)
 }
