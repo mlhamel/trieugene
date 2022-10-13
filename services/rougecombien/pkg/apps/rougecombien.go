@@ -13,10 +13,11 @@ import (
 )
 
 type Rougecombien struct {
-	cfg          *config.Config
-	jsonStoreJob trieugene.Job
-	csvStoreJob  trieugene.Job
-	manager      trieugene.Manager
+	cfg             *config.Config
+	jsonStoreJob    trieugene.Job
+	csvStoreJob     trieugene.Job
+	parquetStoreJob trieugene.Job
+	manager         trieugene.Manager
 }
 
 func NewRougecombien(cfg *config.Config) *Rougecombien {
@@ -31,10 +32,11 @@ func NewRougecombien(cfg *config.Config) *Rougecombien {
 	})
 
 	return &Rougecombien{
-		cfg:          cfg,
-		jsonStoreJob: trieugene.NewJsonStoreJob("json-store-rougecombien", cfg, store),
-		csvStoreJob:  trieugene.NewCsvStoreJob("csv-store-rougecombien", cfg, store),
-		manager:      trieugene.NewFaktoryManager(cfg),
+		cfg:             cfg,
+		jsonStoreJob:    trieugene.NewJsonStoreJob("json-store-rougecombien", cfg, store),
+		csvStoreJob:     trieugene.NewCsvStoreJob("csv-store-rougecombien", cfg, store),
+		parquetStoreJob: trieugene.NewParquetStoreJob("parquet-store-rougecombien", cfg, store),
+		manager:         trieugene.NewFaktoryManager(cfg),
 	}
 }
 
@@ -42,10 +44,11 @@ func NewRougecombienDev(cfg *config.Config) *Rougecombien {
 	store := store.NewLocal(cfg)
 
 	return &Rougecombien{
-		cfg:          cfg,
-		jsonStoreJob: trieugene.NewJsonStoreJob("json-store-rougecombien", cfg, store),
-		csvStoreJob:  trieugene.NewCsvStoreJob("csv-store-rougecombien", cfg, store),
-		manager:      trieugene.NewFaktoryManager(cfg),
+		cfg:             cfg,
+		jsonStoreJob:    trieugene.NewJsonStoreJob("json-store-rougecombien", cfg, store),
+		csvStoreJob:     trieugene.NewCsvStoreJob("csv-store-rougecombien", cfg, store),
+		parquetStoreJob: trieugene.NewParquetStoreJob("parquet-store-rougecombien", cfg, store),
+		manager:         trieugene.NewFaktoryManager(cfg),
 	}
 }
 
@@ -53,10 +56,10 @@ func (r *Rougecombien) Run(ctx context.Context) error {
 	httpScraper := scraper.NewHttpScraper(r.cfg)
 	parser := scraper.NewParser(r.cfg, httpScraper)
 
-	return r.manager.Perform(jobs.NewCsvJob(&jobs.CsvJobKwargs{
+	return r.manager.Perform(jobs.NewParquetJob(&jobs.ParquetJobKwargs{
 		Cfg:      r.cfg,
 		Manager:  r.manager,
-		StoreJob: r.csvStoreJob,
+		StoreJob: r.parquetStoreJob,
 		Parser:   parser,
 		Scraper:  httpScraper,
 	}))
@@ -68,10 +71,10 @@ func (r *Rougecombien) RunDevelopment(ctx context.Context) error {
 	httpScraper := scraper.NewHttpScraper(r.cfg)
 	parser := scraper.NewParser(r.cfg, httpScraper)
 
-	job := jobs.NewCsvJob(&jobs.CsvJobKwargs{
+	job := jobs.NewParquetJob(&jobs.ParquetJobKwargs{
 		Cfg:      r.cfg,
 		Manager:  r.manager,
-		StoreJob: r.csvStoreJob,
+		StoreJob: r.parquetStoreJob,
 		Scraper:  httpScraper,
 		Parser:   parser,
 	})
@@ -85,10 +88,10 @@ func (r *Rougecombien) RunInline(ctx context.Context) error {
 	httpScraper := scraper.NewHttpScraper(r.cfg)
 	parser := scraper.NewParser(r.cfg, httpScraper)
 
-	job := jobs.NewCsvJob(&jobs.CsvJobKwargs{
+	job := jobs.NewParquetJob(&jobs.ParquetJobKwargs{
 		Cfg:      r.cfg,
 		Manager:  r.manager,
-		StoreJob: r.csvStoreJob,
+		StoreJob: r.parquetStoreJob,
 		Scraper:  httpScraper,
 		Parser:   parser,
 	})
